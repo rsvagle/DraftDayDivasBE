@@ -1,0 +1,108 @@
+from django.shortcuts import render
+from django.http import HttpResponse
+
+from rest_framework import generics, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from .serializers import *
+from .models import *
+
+from rest_framework.authtoken.models import Token
+from django.contrib.auth.models import User
+# Create your views here.
+
+from django.shortcuts import get_object_or_404
+
+from rest_framework.decorators import api_view
+
+# Login
+@api_view(['POST'])
+def login(request):
+    # find user
+    user = get_object_or_404(User, username=request.data['username'])
+    if not user.check_password(request.data['password']):
+        return Response({"detail":"Password not found.", "status":status.HTTP_404_NOT_FOUND})
+
+    serializer = UserSerializer(instance=user)
+
+    token, created = Token.objects.get_or_create(user=user)
+    return Response({"token":token.key, "user": serializer.data})
+
+# Signup
+@api_view(['POST'])
+def signup(request):
+    serializer = UserSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        serializer.save()
+        user = User.objects.get(username=request.data['username'])
+        user.set_password(request.data['password'])
+        user.save()
+        token = Token.objects.create(user=user)
+        return Response({"token":token.key, "user": serializer.data})
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+from rest_framework.decorators import authentication_classes, permission_classes
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+
+# Test token
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def test_token(request):
+    return Response("Passed for {}".format(request.user.email))
+
+
+# Get profile
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def get_user_profile(request):
+    # Access the user directly from request.user
+    user = request.user
+
+    # Now, you can use the user object to access any user information, such as username or user id
+    user_id = user.id
+    username = user.username
+
+    # Fetch additional user information from your database if needed
+    # For example, you might have a UserProfile model associated with your User model
+    # user_profile = UserProfile.objects.get(user=user)
+
+    # Construct your response with the user information
+    response_data = {
+        "user_id": user_id,
+        "username": username,
+        "DATA_TEST": "TESTTEST"
+        # Include other user details as needed
+    }
+
+    return Response(response_data)
+
+
+
+def main(request):
+    return HttpResponse("Hello")
+
+def players(request):
+    return HttpResponse("Players Page")
+
+class DraftedTeamView(generics.ListAPIView):
+    queryset = DraftedTeam.objects.all()
+    serializer_class = DraftedTeamSerializer
+
+class NewsArticleView(generics.ListAPIView):
+    queryset = NewsArticle.objects.all()
+    serializer_class = NewsArticleSerializer
+
+class PlayerSummaryView(APIView):
+    def get(self, request, id):
+        try:
+            football_player = FootballPlayer.objects.get(id=id)
+            football_player_summary = FootballPlayerSummary(football_player)
+            serializer = FootballPlayerSummarySerializer(football_player_summary)
+            return Response(serializer.data)
+        except FootballPlayer.DoesNotExist:
+            return Response({'message': 'Player not found'}, status=status.HTTP_404_NOT_FOUND)

@@ -1,0 +1,77 @@
+from django.db import models
+import string
+import random
+from random import randint
+
+# Create your models here.
+
+def generate_unique_teamname():
+    length = 14
+
+    while True:
+        teamName = ''.join(random.choices(string.ascii_lowercase, k=length))
+        if DraftedTeam.objects.filter(teamName=teamName).count() == 0:
+            break
+        
+        return teamName
+
+class DraftedTeam(models.Model):
+    id = models.IntegerField(primary_key=True)
+    user_id = models.IntegerField()
+    team_name = models.CharField(max_length=60, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class NewsArticle(models.Model):
+    id = models.IntegerField(primary_key=True)
+    author = models.CharField(max_length=60, default="")
+    date = models.DateTimeField(null=True, blank=True)
+    title = models.CharField(max_length=60, default="")
+    description =models.CharField(max_length=60, default="")
+    article_content = models.CharField(max_length=5000, default="")
+    image_url = models.CharField(max_length=5000, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class FootballTeam(models.Model):
+    id = models.IntegerField(primary_key=True)
+    team_name = models.CharField(max_length=60, default="")
+    location = models.CharField(max_length=100, default="")
+    coach = models.CharField(max_length=100, default="")
+    stadium = models.CharField(max_length=100, default="")
+    founded_year = models.IntegerField(null=True, blank=True)
+    championships_won = models.IntegerField(default=0)
+    logo_url = models.CharField(max_length=200, default="")
+    official_website_url = models.CharField(max_length=200, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class FootballPlayer(models.Model):
+    id = models.IntegerField(primary_key=True)
+    first_name = models.CharField(max_length=60, default="")
+    last_name = models.CharField(max_length=60, default="")
+    position = models.CharField(max_length=30, default="")
+    team = models.ForeignKey(FootballTeam, on_delete=models.CASCADE)
+    number = models.IntegerField(null=True, blank=True)
+    height = models.CharField(max_length=10, default="")
+    weight = models.IntegerField(null=True, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    years_pro = models.IntegerField(default=0)
+    college = models.CharField(max_length=100, default="", blank=True)
+    photo_url = models.CharField(max_length=200, default="", blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class FootballPlayerSummary:
+    # Assuming this class is used purely for structuring data, not for creating a new table
+    def __init__(self, football_player):
+        self.__dict__ = football_player.__dict__.copy()
+        self.team_name = football_player.team.team_name
+        self.season_passing_yards = randint(0, 500)
+        self.season_passing_tds = randint(0, 50)
+        self.season_rushing_yards = randint(0, 500)
+        self.season_rushing_tds = randint(0, 20)
+        self.season_receiving_yards = randint(0, 500)
+        self.season_receiving_tds = randint(0, 20)
+        self.season_fantasy_points = randint(0, 500)
+
+class PlayerStats(models.Model):
+    id = models.IntegerField(primary_key=True)
+    player_id = models.IntegerField(null=True, blank=True)
+    
