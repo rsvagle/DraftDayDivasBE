@@ -18,15 +18,20 @@ from rest_framework.decorators import api_view
 # Login
 @api_view(['POST'])
 def login(request):
-    # find user
-    user = get_object_or_404(User, username=request.data['username'])
-    if not user.check_password(request.data['password']):
-        return Response({"detail":"Password not found.", "status":status.HTTP_404_NOT_FOUND})
-
-    serializer = UserSerializer(instance=user)
+    username = request.data.get('username')
+    password = request.data.get('password')
+    
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return Response({"detail": "User not found."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if not user.check_password(password):
+        return Response({"detail": "Incorrect password."}, status=status.HTTP_400_BAD_REQUEST)
 
     token, created = Token.objects.get_or_create(user=user)
-    return Response({"token":token.key, "user": serializer.data})
+    serializer = UserSerializer(instance=user)
+    return Response({"token": token.key, "user": serializer.data})
 
 # Signup
 @api_view(['POST'])
@@ -46,6 +51,7 @@ def signup(request):
 from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django.views.decorators.http import require_http_methods
 
 # Test token
 @api_view(['GET'])
@@ -66,6 +72,7 @@ def get_user_profile(request):
     # Now, you can use the user object to access any user information, such as username or user id
     user_id = user.id
     username = user.username
+    email = user.email
 
     # Fetch additional user information from your database if needed
     # For example, you might have a UserProfile model associated with your User model
@@ -75,19 +82,33 @@ def get_user_profile(request):
     response_data = {
         "user_id": user_id,
         "username": username,
-        "DATA_TEST": "TESTTEST"
+        "email": email,
+        "first_name": user.first_name,
+        "last_name": user.last_name
         # Include other user details as needed
     }
 
     return Response(response_data)
 
+# Save profile
+@api_view(['POST'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def save_user_profile(request):
+    # Save/update profile logic
+    user = User.objects.get(id=request.user.id)  # Example, adjust accordingly
 
+    user.email = request.data['email']
+    user.username = request.data['username']
+    user.first_name = request.data['first_name']
+    user.last_name = request.data['last_name']
+    try:
+        user.save()
+    except:
+        return Response(status=status.HTTP_409_CONFLICT)
 
-def main(request):
-    return HttpResponse("Hello")
+    return Response(status=status.HTTP_200_OK)
 
-def players(request):
-    return HttpResponse("Players Page")
 
 class DraftedTeamView(generics.ListAPIView):
     queryset = DraftedTeam.objects.all()

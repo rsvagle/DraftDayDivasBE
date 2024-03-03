@@ -12,4 +12,5 @@ urlpatterns = [
     path('signup/', views.signup),
     path('test_token/', views.test_token),
     path('profile/', views.get_user_profile),
+    path('save_profile/', views.save_user_profile),
 ]

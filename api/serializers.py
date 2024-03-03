@@ -48,4 +48,4 @@ class FootballPlayerSummarySerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = User
-        fields = ['id','username','password','email']
+        fields = ['id','username','password','email', 'first_name', 'last_name']
