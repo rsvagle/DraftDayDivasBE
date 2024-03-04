@@ -118,6 +118,10 @@ class NewsArticleView(generics.ListAPIView):
     queryset = NewsArticle.objects.all()
     serializer_class = NewsArticleSerializer
 
+class InjuryReportArticleView(generics.ListAPIView):
+    queryset = InjuryReportArticle.objects.all()
+    serializer_class = InjuryReportArticleSerializer
+
 class PlayerSummaryView(APIView):
     def get(self, request, id):
         try:
@@ -127,3 +131,7 @@ class PlayerSummaryView(APIView):
             return Response(serializer.data)
         except FootballPlayer.DoesNotExist:
             return Response({'message': 'Player not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+class FootballTeamsView(generics.ListAPIView):
+    queryset = FootballTeam.objects.all()
+    serializer_class = FootballTeamSerializer

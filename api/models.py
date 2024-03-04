@@ -4,6 +4,21 @@ import random
 from random import randint
 
 # Create your models here.
+CONFERENCE_CHOICES = (
+    ('AFC', 'American Football Conference'),
+    ('NFC', 'National Football Conference'),
+)
+
+DIVISION_CHOICES = (
+    ('AFC North', 'AFC North'),
+    ('AFC South', 'AFC South'),
+    ('AFC East', 'AFC East'),
+    ('AFC West', 'AFC West'),
+    ('NFC North', 'NFC North'),
+    ('NFC South', 'NFC South'),
+    ('NFC East', 'NFC East'),
+    ('NFC West', 'NFC West'),
+)
 
 def generate_unique_teamname():
     length = 14
@@ -35,7 +50,21 @@ class FootballTeam(models.Model):
     id = models.IntegerField(primary_key=True)
     team_name = models.CharField(max_length=60, default="")
     location = models.CharField(max_length=100, default="")
+    abbreviation = models.CharField(max_length=3, default="")
+    team_color_primary = models.CharField(max_length=7, default="")
+    team_color_secondary = models.CharField(max_length=7, default="")
     coach = models.CharField(max_length=100, default="")
+    conference = models.CharField(max_length=3, choices=CONFERENCE_CHOICES, default="")
+    division = models.CharField(max_length=50, choices=DIVISION_CHOICES, default="")
+    twitter_url = models.CharField(max_length=200, default="", blank=True)
+    instagram_url = models.CharField(max_length=200, default="", blank=True)
+    facebook_url = models.CharField(max_length=200, default="", blank=True)
+    last_season_wins = models.IntegerField(default=0)
+    last_season_losses = models.IntegerField(default=0)
+    last_season_ties = models.IntegerField(default=0)
+    this_season_wins = models.IntegerField(default=0)
+    this_season_losses = models.IntegerField(default=0)
+    this_season_ties = models.IntegerField(default=0)
     stadium = models.CharField(max_length=100, default="")
     founded_year = models.IntegerField(null=True, blank=True)
     championships_won = models.IntegerField(default=0)
@@ -75,3 +104,14 @@ class PlayerStats(models.Model):
     id = models.IntegerField(primary_key=True)
     player_id = models.IntegerField(null=True, blank=True)
     
+
+class InjuryReportArticle(models.Model):
+    id = models.IntegerField(primary_key=True)
+    author = models.CharField(max_length=60, default="")
+    date = models.DateTimeField(null=True, blank=True)
+    player_id = models.IntegerField(null=True, blank=True)
+    title = models.CharField(max_length=60, default="")
+    description = models.CharField(max_length=60, default="")
+    article_content = models.CharField(max_length=5000, default="")
+    image_url = models.CharField(max_length=5000, default="")
+    created_at = models.DateTimeField(auto_now_add=True)

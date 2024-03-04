@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 
-from .models import DraftedTeam, FootballPlayer
+from .models import DraftedTeam, FootballPlayer, FootballTeam, InjuryReportArticle
 from .models import NewsArticle
 
 class DraftedTeamSerializer(serializers.ModelSerializer):
@@ -14,11 +14,19 @@ class NewsArticleSerializer(serializers.ModelSerializer):
         model = NewsArticle
         fields = ['id', 'author', 'title', 'description', 'article_content', 'image_url', 'created_at']
 
-
+class InjuryReportArticleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InjuryReportArticle
+        fields = ['id', 'author', 'player_id', 'title', 'description', 'article_content', 'image_url', 'created_at']
 
 class FootballPlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = FootballPlayer
+        fields = '__all__'
+
+class FootballTeamSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FootballTeam
         fields = '__all__'
 
 class FootballPlayerSummarySerializer(serializers.Serializer):
