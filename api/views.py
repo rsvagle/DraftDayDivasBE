@@ -1,19 +1,16 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
-
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import *
 from .models import *
-
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
-# Create your views here.
-
-from django.shortcuts import get_object_or_404
-
-from rest_framework.decorators import api_view
+from rest_framework.decorators import authentication_classes, permission_classes, api_view
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from django.views.decorators.http import require_http_methods
 
 # Login
 @api_view(['POST'])
@@ -47,11 +44,6 @@ def signup(request):
         return Response({"token":token.key, "user": serializer.data})
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-from rest_framework.decorators import authentication_classes, permission_classes
-from rest_framework.authentication import SessionAuthentication, TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
-from django.views.decorators.http import require_http_methods
 
 # Test token
 @api_view(['GET'])
@@ -114,13 +106,19 @@ class DraftedTeamView(generics.ListAPIView):
     queryset = DraftedTeam.objects.all()
     serializer_class = DraftedTeamSerializer
 
+
+
 class NewsArticleView(generics.ListAPIView):
     queryset = NewsArticle.objects.all()
     serializer_class = NewsArticleSerializer
 
+
+
 class InjuryReportArticleView(generics.ListAPIView):
     queryset = InjuryReportArticle.objects.all()
     serializer_class = InjuryReportArticleSerializer
+
+
 
 class PlayerSummaryView(APIView):
     def get(self, request, id):
@@ -135,3 +133,51 @@ class PlayerSummaryView(APIView):
 class FootballTeamsView(generics.ListAPIView):
     queryset = FootballTeam.objects.all()
     serializer_class = FootballTeamSerializer
+
+
+
+class FootballPlayersListView(generics.ListAPIView):
+    queryset = FootballPlayer.objects.all()
+    serializer_class = FootballPlayerSerializer
+
+
+
+class FootballPlayerWithTeamView(APIView):
+    def get(self, request, id, format=None):
+        try:
+            player = FootballPlayer.objects.get(id=id)
+            # Pass 'include_team' flag via the context
+            serializer = FootballPlayerSerializer(player, context={'include_team': True})
+            return Response(serializer.data)
+        except FootballPlayer.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+
+
+class FootballPlayerWithTeamLatestSeasonView(APIView):
+    def get(self, request, id, format=None):
+        try:
+            player = FootballPlayer.objects.get(id=id)
+            serializer = FootballPlayerSerializer(player, context={'include_team': True, 'season': '2023'})
+            return Response(serializer.data)
+        except FootballPlayer.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    
+class FootballPlayerAllSeasonsView(APIView):
+    def get(self, request, id, format=None):
+        try:
+            player = FootballPlayer.objects.get(id=id)
+            serializer = FootballPlayerAllSeasonsSerializer(player)
+            return Response(serializer.data)
+        except FootballPlayer.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+class FootballPlayerWithoutTeamView(APIView):
+    def get(self, request, id, format=None):
+        try:
+            player = FootballPlayer.objects.get(id=id)
+            # Pass 'include_team' flag via the context
+            serializer = FootballPlayerSerializer(player, context={'include_team': False})
+            return Response(serializer.data)
+        except FootballPlayer.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)

@@ -87,6 +87,50 @@ class FootballPlayer(models.Model):
     photo_url = models.CharField(max_length=200, default="", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+class PlayerSeasonStats(models.Model):
+    id = models.IntegerField(primary_key=True)
+    player = models.ForeignKey(FootballPlayer, on_delete=models.CASCADE, related_name='season_stats')
+    season = models.CharField(max_length=10)  # Example: "2023"
+    team = models.ForeignKey(FootballTeam, on_delete=models.CASCADE, related_name='season_team')
+    games_played = models.IntegerField()
+    
+    season_passing_yards = models.IntegerField()
+    season_passing_tds = models.IntegerField()
+    season_passer_rating = models.FloatField()
+
+    season_ints = models.IntegerField()
+    season_fumbles = models.IntegerField()
+    season_fumbles_lost = models.IntegerField()
+    season_safeties = models.IntegerField()
+
+    season_rushing_yards = models.IntegerField()
+    season_rushing_tds = models.IntegerField()
+
+    season_receptions = models.IntegerField()
+    season_receiving_yards = models.IntegerField()
+    season_receiving_tds = models.IntegerField()
+
+    season_fgm = models.IntegerField()
+    season_fga = models.IntegerField()
+    season_xpm = models.IntegerField()
+    season_xpa = models.IntegerField()
+
+    season_fantasy_points = models.FloatField()
+
+    def __str__(self):
+        return f"{self.player.first_name} {self.player.last_name} - {self.season}"
+
+class InjuryReportArticle(models.Model):
+    id = models.IntegerField(primary_key=True)
+    author = models.CharField(max_length=60, default="")
+    date = models.DateTimeField(null=True, blank=True)
+    player_id = models.IntegerField(null=True, blank=True)
+    title = models.CharField(max_length=60, default="")
+    description = models.CharField(max_length=60, default="")
+    article_content = models.CharField(max_length=5000, default="")
+    image_url = models.CharField(max_length=5000, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+
 class FootballPlayerSummary:
     # Assuming this class is used purely for structuring data, not for creating a new table
     def __init__(self, football_player):
@@ -99,19 +143,3 @@ class FootballPlayerSummary:
         self.season_receiving_yards = randint(0, 500)
         self.season_receiving_tds = randint(0, 20)
         self.season_fantasy_points = randint(0, 500)
-
-class PlayerStats(models.Model):
-    id = models.IntegerField(primary_key=True)
-    player_id = models.IntegerField(null=True, blank=True)
-    
-
-class InjuryReportArticle(models.Model):
-    id = models.IntegerField(primary_key=True)
-    author = models.CharField(max_length=60, default="")
-    date = models.DateTimeField(null=True, blank=True)
-    player_id = models.IntegerField(null=True, blank=True)
-    title = models.CharField(max_length=60, default="")
-    description = models.CharField(max_length=60, default="")
-    article_content = models.CharField(max_length=5000, default="")
-    image_url = models.CharField(max_length=5000, default="")
-    created_at = models.DateTimeField(auto_now_add=True)

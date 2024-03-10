@@ -13,4 +13,9 @@ urlpatterns = [
     path('profile/', views.get_user_profile),
     path('save_profile/', views.save_user_profile),
     path('teams/', views.FootballTeamsView.as_view()),
+    path('player/with-team/<int:id>', views.FootballPlayerWithTeamView.as_view(), name='player-with-team'),
+    path('player/without-team/<int:id>', views.FootballPlayerWithoutTeamView.as_view(), name='player-without-team'),
+    path('player/with-team-latest-season/<int:id>', views.FootballPlayerWithTeamLatestSeasonView.as_view(), name='player-with-team-latest-season'),
+    path('player/all-seasons/<int:id>', views.FootballPlayerAllSeasonsView.as_view(), name='player-all-seasons'),
+    path('players/', views.FootballPlayersListView.as_view())
 ]

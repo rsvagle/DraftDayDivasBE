@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 
-from .models import DraftedTeam, FootballPlayer, FootballTeam, InjuryReportArticle
+from .models import DraftedTeam, FootballPlayer, FootballTeam, InjuryReportArticle, PlayerSeasonStats
 from .models import NewsArticle
 
 class DraftedTeamSerializer(serializers.ModelSerializer):
@@ -19,16 +19,38 @@ class InjuryReportArticleSerializer(serializers.ModelSerializer):
         model = InjuryReportArticle
         fields = ['id', 'author', 'player_id', 'title', 'description', 'article_content', 'image_url', 'created_at']
 
-class FootballPlayerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = FootballPlayer
-        fields = '__all__'
-
 class FootballTeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = FootballTeam
         fields = '__all__'
 
+class FootballPlayerSerializer(serializers.ModelSerializer):
+    team = serializers.SerializerMethodField()
+    season_stats_for_season = serializers.SerializerMethodField()  # Renamed to reflect dynamic season functionality
+
+    class Meta:
+        model = FootballPlayer
+        fields = '__all__'
+    
+    def get_team(self, obj):
+        if self.context.get('include_team', False):
+            serializer = FootballTeamSerializer(obj.team)
+            return serializer.data
+        else:
+            return obj.team_id
+
+    def get_season_stats_for_season(self, obj):
+        # Retrieve the season value from the context
+        season = self.context.get('season', None)
+        if season:
+            # Fetch the season stats for the player for the specified season
+            season_stats = obj.season_stats.filter(season=season).first()
+            if season_stats:
+                serializer = PlayerSeasonStatsSerializer(season_stats)
+                return serializer.data
+        return None
+
+        
 class FootballPlayerSummarySerializer(serializers.Serializer):
     # All FootballPlayer fields are included
     first_name = serializers.CharField(max_length=60)
@@ -53,7 +75,28 @@ class FootballPlayerSummarySerializer(serializers.Serializer):
     season_fantasy_points = serializers.IntegerField()
 
 
+class PlayerSeasonStatsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlayerSeasonStats
+        fields = '__all__'
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = User
         fields = ['id','username','password','email', 'first_name', 'last_name']
+
+
+
+class FootballPlayerAllSeasonsSerializer(serializers.ModelSerializer):
+    team = FootballTeamSerializer(read_only=True)  # Always include team info
+    all_season_stats = serializers.SerializerMethodField()  # Renamed to reflect fetching all seasons
+
+    class Meta:
+        model = FootballPlayer
+        fields = '__all__'  # Make sure 'team' and 'all_season_stats' are included
+
+    def get_all_season_stats(self, obj):
+        # Fetch all season stats for the player
+        season_stats = obj.season_stats.all()
+        serializer = PlayerSeasonStatsSerializer(season_stats, many=True)
+        return serializer.data
