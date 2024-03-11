@@ -79,6 +79,7 @@ class FootballPlayerSummarySerializer(serializers.ModelSerializer):
 
 class PlayerSeasonStatsSerializer(serializers.ModelSerializer):
     team = serializers.SerializerMethodField()
+    player = serializers.SerializerMethodField()
     
     class Meta:
         model = PlayerSeasonStats
@@ -86,6 +87,10 @@ class PlayerSeasonStatsSerializer(serializers.ModelSerializer):
 
     def get_team(self, obj):
         serializer = FootballTeamSerializer(obj.team)
+        return serializer.data
+    
+    def get_player(self, obj):
+        serializer = FootballPlayerSerializer(obj.player)
         return serializer.data
 
 class UserSerializer(serializers.ModelSerializer):

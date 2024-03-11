@@ -143,6 +143,23 @@ class FootballPlayersListView(generics.ListAPIView):
 
 
 
+class CurrentSeasonStatsListView(APIView):
+    serializer_class = PlayerSeasonStatsSerializer
+
+    def get(self, request, year, format=None):
+        if year is not None:
+            # Filter the queryset based on the provided year
+            queryset = PlayerSeasonStats.objects.filter(year=year).all()
+        else:
+            # Optionally, handle the case where no year is provided, such as returning all objects or none
+            queryset = PlayerSeasonStats.objects.none()  # Example: Return an empty queryset
+
+        # Serialize and return the filtered queryset
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)
+
+
+
 class FootballPlayerWithTeamView(APIView):
     def get(self, request, id, format=None):
         try:
@@ -153,15 +170,19 @@ class FootballPlayerWithTeamView(APIView):
         except FootballPlayer.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+
+
 class FootballPlayerWithTeamLatestSeasonView(APIView):
     def get(self, request, id, format=None):
         try:
             player = FootballPlayer.objects.get(id=id)
-            serializer = FootballPlayerSerializer(player, context={'include_team': True, 'season': '2023'})
+            serializer = FootballPlayerSerializer(player, context={'include_team': True, 'season': '2024'})
             return Response(serializer.data)
         except FootballPlayer.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-    
+
+
+
 class FootballPlayerAllSeasonsView(APIView):
     def get(self, request, id, format=None):
         try:
@@ -170,6 +191,8 @@ class FootballPlayerAllSeasonsView(APIView):
             return Response(serializer.data)
         except FootballPlayer.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+
 
 class FootballPlayerWithoutTeamView(APIView):
     def get(self, request, id, format=None):

@@ -17,5 +17,6 @@ urlpatterns = [
     path('player/without-team/<int:id>', views.FootballPlayerWithoutTeamView.as_view(), name='player-without-team'),
     path('player/with-team-latest-season/<int:id>', views.FootballPlayerWithTeamLatestSeasonView.as_view(), name='player-with-team-latest-season'),
     path('player/all-seasons/<int:id>', views.FootballPlayerAllSeasonsView.as_view(), name='player-all-seasons'),
-    path('players/', views.FootballPlayersListView.as_view())
+    path('players/', views.FootballPlayersListView.as_view()),
+    path('stats/<str:year>', views.CurrentSeasonStatsListView.as_view())
 ]
