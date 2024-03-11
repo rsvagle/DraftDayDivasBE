@@ -121,14 +121,15 @@ class InjuryReportArticleView(generics.ListAPIView):
 
 
 class PlayerSummaryView(APIView):
-    def get(self, request, id):
+    def get(self, request, id, format=None):
         try:
-            football_player = FootballPlayer.objects.get(id=id)
-            football_player_summary = FootballPlayerSummary(football_player)
-            serializer = FootballPlayerSummarySerializer(football_player_summary)
+            player = FootballPlayer.objects.get(id=id)
+            serializer = FootballPlayerSummarySerializer(player, context={'include_team': True, 'season': '2023'})
             return Response(serializer.data)
         except FootballPlayer.DoesNotExist:
-            return Response({'message': 'Player not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+
         
 class FootballTeamsView(generics.ListAPIView):
     queryset = FootballTeam.objects.all()
@@ -151,8 +152,6 @@ class FootballPlayerWithTeamView(APIView):
             return Response(serializer.data)
         except FootballPlayer.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        
-
 
 class FootballPlayerWithTeamLatestSeasonView(APIView):
     def get(self, request, id, format=None):

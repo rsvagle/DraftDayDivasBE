@@ -90,32 +90,30 @@ class FootballPlayer(models.Model):
 class PlayerSeasonStats(models.Model):
     id = models.IntegerField(primary_key=True)
     player = models.ForeignKey(FootballPlayer, on_delete=models.CASCADE, related_name='season_stats')
-    season = models.CharField(max_length=10)  # Example: "2023"
+    year = models.CharField(max_length=10)  # Example: "2023"
     team = models.ForeignKey(FootballTeam, on_delete=models.CASCADE, related_name='season_team')
     games_played = models.IntegerField()
     
-    season_passing_yards = models.IntegerField()
-    season_passing_tds = models.IntegerField()
-    season_passer_rating = models.FloatField()
+    passing_yards = models.IntegerField()
+    passing_tds = models.IntegerField()
+    passer_rating = models.FloatField()
 
-    season_ints = models.IntegerField()
-    season_fumbles = models.IntegerField()
-    season_fumbles_lost = models.IntegerField()
-    season_safeties = models.IntegerField()
+    ints = models.IntegerField()
+    fumbles = models.IntegerField()
+    fumbles_lost = models.IntegerField()
+    safeties = models.IntegerField()
 
-    season_rushing_yards = models.IntegerField()
-    season_rushing_tds = models.IntegerField()
+    rushing_yards = models.IntegerField()
+    rushing_tds = models.IntegerField()
 
-    season_receptions = models.IntegerField()
-    season_receiving_yards = models.IntegerField()
-    season_receiving_tds = models.IntegerField()
+    receptions = models.IntegerField()
+    receiving_yards = models.IntegerField()
+    receiving_tds = models.IntegerField()
 
-    season_fgm = models.IntegerField()
-    season_fga = models.IntegerField()
-    season_xpm = models.IntegerField()
-    season_xpa = models.IntegerField()
-
-    season_fantasy_points = models.FloatField()
+    fgm = models.IntegerField()
+    fga = models.IntegerField()
+    xpm = models.IntegerField()
+    xpa = models.IntegerField()
 
     def __str__(self):
         return f"{self.player.first_name} {self.player.last_name} - {self.season}"

@@ -6,7 +6,7 @@ urlpatterns = [
     path('drafted_teams/', DraftedTeamView.as_view()),
     path('news/', NewsArticleView.as_view()),
     path('injury-report/', InjuryReportArticleView.as_view()),
-    path('player/player-summary/<int:id>', PlayerSummaryView.as_view(), name='player-summary'),
+    path('player/player-summary/<int:id>', views.PlayerSummaryView.as_view(), name='player-summary'),
     path('login/', views.login),
     path('signup/', views.signup),
     path('test_token/', views.test_token),

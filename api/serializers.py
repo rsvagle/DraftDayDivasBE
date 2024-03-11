@@ -44,41 +44,49 @@ class FootballPlayerSerializer(serializers.ModelSerializer):
         season = self.context.get('season', None)
         if season:
             # Fetch the season stats for the player for the specified season
-            season_stats = obj.season_stats.filter(season=season).first()
+            season_stats = obj.season_stats.filter(year=season).order_by('year').first()
             if season_stats:
                 serializer = PlayerSeasonStatsSerializer(season_stats)
                 return serializer.data
         return None
 
         
-class FootballPlayerSummarySerializer(serializers.Serializer):
-    # All FootballPlayer fields are included
-    first_name = serializers.CharField(max_length=60)
-    last_name = serializers.CharField(max_length=60)
-    position = serializers.CharField(max_length=30)
-    team_name = serializers.CharField(read_only=True)
-    number = serializers.IntegerField(allow_null=True, required=False)
-    height = serializers.CharField(max_length=10)
-    weight = serializers.IntegerField(allow_null=True, required=False)
-    date_of_birth = serializers.DateField(format="%Y-%m-%d", input_formats=['%Y-%m-%d', 'iso-8601'], allow_null=True, required=False)
-    years_pro = serializers.IntegerField()
-    college = serializers.CharField(max_length=100, allow_blank=True, required=False)
-    photo_url = serializers.URLField(max_length=200, allow_blank=True, required=False)
+class FootballPlayerSummarySerializer(serializers.ModelSerializer):
+    team = serializers.SerializerMethodField()
+    season_stats = serializers.SerializerMethodField()  # Renamed to reflect dynamic season functionality
 
-    # Additional fields
-    season_passing_yards = serializers.IntegerField()
-    season_passing_tds = serializers.IntegerField()
-    season_rushing_yards = serializers.IntegerField()
-    season_rushing_tds = serializers.IntegerField()
-    season_receiving_yards = serializers.IntegerField()
-    season_receiving_tds = serializers.IntegerField()
-    season_fantasy_points = serializers.IntegerField()
+    class Meta:
+        model = FootballPlayer
+        fields = '__all__'
+    
+    def get_team(self, obj):
+        if self.context.get('include_team', False):
+            serializer = FootballTeamSerializer(obj.team)
+            return serializer.data
+        else:
+            return obj.team_id
 
+    def get_season_stats(self, obj):
+        # Retrieve the season value from the context
+        season = self.context.get('season', None)
+        if season:
+            # Fetch the season stats for the player for the specified season
+            season_stats = obj.season_stats.filter(year=season).first()
+            if season_stats:
+                serializer = PlayerSeasonStatsSerializer(season_stats)
+                return serializer.data
+        return None
 
 class PlayerSeasonStatsSerializer(serializers.ModelSerializer):
+    team = serializers.SerializerMethodField()
+    
     class Meta:
         model = PlayerSeasonStats
         fields = '__all__'
+
+    def get_team(self, obj):
+        serializer = FootballTeamSerializer(obj.team)
+        return serializer.data
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta(object):
@@ -89,14 +97,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 class FootballPlayerAllSeasonsSerializer(serializers.ModelSerializer):
     team = FootballTeamSerializer(read_only=True)  # Always include team info
-    all_season_stats = serializers.SerializerMethodField()  # Renamed to reflect fetching all seasons
+    seasons = serializers.SerializerMethodField()  # Renamed to reflect fetching all seasons
 
     class Meta:
         model = FootballPlayer
         fields = '__all__'  # Make sure 'team' and 'all_season_stats' are included
 
-    def get_all_season_stats(self, obj):
+    def get_seasons(self, obj):
         # Fetch all season stats for the player
-        season_stats = obj.season_stats.all()
+        season_stats = obj.season_stats.all().order_by('-year')
         serializer = PlayerSeasonStatsSerializer(season_stats, many=True)
         return serializer.data
