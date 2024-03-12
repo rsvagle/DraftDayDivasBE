@@ -1,22 +1,30 @@
 from django.urls import path
-from .views import InjuryReportArticleView, PlayerSummaryView, DraftedTeamView, NewsArticleView
-from api import views
+from api.views import football_teams_views, auth_views, news_views, drafted_team_views, player_views, stats_views
 
 urlpatterns = [
-    path('drafted_teams/', DraftedTeamView.as_view()),
-    path('news/', NewsArticleView.as_view()),
-    path('injury-report/', InjuryReportArticleView.as_view()),
-    path('player/player-summary/<int:id>', views.PlayerSummaryView.as_view(), name='player-summary'),
-    path('login/', views.login),
-    path('signup/', views.signup),
-    path('test_token/', views.test_token),
-    path('profile/', views.get_user_profile),
-    path('save_profile/', views.save_user_profile),
-    path('teams/', views.FootballTeamsView.as_view()),
-    path('player/with-team/<int:id>', views.FootballPlayerWithTeamView.as_view(), name='player-with-team'),
-    path('player/without-team/<int:id>', views.FootballPlayerWithoutTeamView.as_view(), name='player-without-team'),
-    path('player/with-team-latest-season/<int:id>', views.FootballPlayerWithTeamLatestSeasonView.as_view(), name='player-with-team-latest-season'),
-    path('player/all-seasons/<int:id>', views.FootballPlayerAllSeasonsView.as_view(), name='player-all-seasons'),
-    path('players/', views.FootballPlayersListView.as_view()),
-    path('stats/<str:year>', views.CurrentSeasonStatsListView.as_view())
+    # User drafted team
+    path('drafted_teams/<int:id>', drafted_team_views.DraftedTeamView.as_view()),
+
+    # News
+    path('news/', news_views.NewsArticleView.as_view()),
+    path('injury-report/', news_views.InjuryReportArticleView.as_view()),
+    
+    # Auth/Registration
+    path('login/', auth_views.login),
+    path('signup/', auth_views.signup),
+    path('test_token/', auth_views.test_token),
+    path('profile/', auth_views.get_user_profile),
+    path('save_profile/', auth_views.save_user_profile),
+
+    # Teams
+    path('teams/', football_teams_views.FootballTeamsView.as_view()),
+
+    # Players
+    path('player/player-summary/<int:id>', player_views.PlayerSummaryView.as_view(), name='player-summary'),
+    path('player/with-team-latest-season/<int:id>', player_views.FootballPlayerWithTeamLatestSeasonView.as_view(), name='player-with-team-latest-season'),
+    path('player/all-seasons/<int:id>', player_views.FootballPlayerAllSeasonsView.as_view(), name='player-all-seasons'),
+    path('players/', player_views.FootballPlayersListView.as_view()),
+    
+    # Stats
+    path('stats/<str:year>', stats_views.GetSeasonStatsListView.as_view())
 ]
