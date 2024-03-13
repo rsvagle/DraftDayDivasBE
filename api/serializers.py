@@ -55,6 +55,8 @@ class FootballPlayerSerializer(serializers.ModelSerializer):
                 return serializer.data
         return None
 
+from .utils import GetDefaultScoringParams
+
 # Player summary
 # Pulls team and latest season
 class FootballPlayerSummarySerializer(serializers.ModelSerializer):
@@ -67,6 +69,7 @@ class FootballPlayerSummarySerializer(serializers.ModelSerializer):
     
     def get_team(self, obj):
         if self.context.get('include_team', False):
+            from .serializers import FootballTeamSerializer  # Import here to avoid circular dependency
             serializer = FootballTeamSerializer(obj.team)
             return serializer.data
         else:
@@ -76,9 +79,35 @@ class FootballPlayerSummarySerializer(serializers.ModelSerializer):
         # Fetch the season stats for the player for the specified season
         season_stats = obj.season_stats.order_by("-year").first()
         if season_stats:
+            from .serializers import PlayerSeasonStatsSerializer  # Import here to avoid circular dependency
             serializer = PlayerSeasonStatsSerializer(season_stats)
-            return serializer.data
+            data = serializer.data
+            
+            # Calculate fantasy points
+            scoring_params = self.context.get('scoring_params', GetDefaultScoringParams())
+            fantasy_points = self.calculate_fantasy_points(season_stats, scoring_params)
+            data['fantasy_points'] = fantasy_points  # Add fantasy points to the serialized data
+            
+            return data
         return None
+
+    def calculate_fantasy_points(self, season_stats, scoring_params):
+        fantasy_points = 0
+        fantasy_points += season_stats.passing_yards * scoring_params.get('passing_yards', 0)
+        fantasy_points += season_stats.passing_tds * scoring_params.get('passing_tds', 0)
+
+        fantasy_points += season_stats.rushing_yards * scoring_params.get('rushing_yards', 0)
+        fantasy_points += season_stats.rushing_tds * scoring_params.get('rushing_tds', 0)
+
+        fantasy_points += season_stats.receptions * scoring_params.get('receptions', 0)
+        fantasy_points += season_stats.receiving_yards * scoring_params.get('receiving_yards', 0)
+        fantasy_points += season_stats.receiving_tds * scoring_params.get('receiving_tds', 0)
+
+        fantasy_points += season_stats.fgm * scoring_params.get('fgm', 0)
+        fantasy_points += season_stats.xpm * scoring_params.get('xpm', 0)
+        
+        # Add other scoring calculations as needed
+        return fantasy_points
 
 # Season statline for a player
 class PlayerSeasonStatsSerializer(serializers.ModelSerializer):
