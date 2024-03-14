@@ -122,7 +122,7 @@ class InjuryReportArticle(models.Model):
     id = models.IntegerField(primary_key=True)
     author = models.CharField(max_length=60, default="")
     date = models.DateTimeField(null=True, blank=True)
-    player_id = models.IntegerField(null=True, blank=True)
+    player = models.ForeignKey(FootballPlayer, on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(max_length=60, default="")
     description = models.CharField(max_length=60, default="")
     article_content = models.CharField(max_length=5000, default="")

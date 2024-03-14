@@ -18,9 +18,18 @@ class NewsArticleSerializer(serializers.ModelSerializer):
 
 # Injury Report
 class InjuryReportArticleSerializer(serializers.ModelSerializer):
+    player = serializers.SerializerMethodField()
+
     class Meta:
         model = InjuryReportArticle
-        fields = ['id', 'author', 'player_id', 'title', 'description', 'article_content', 'image_url', 'created_at']
+        fields = ['id', 'author', 'player', 'title', 'description', 'article_content', 'image_url', 'created_at']
+
+    def get_player(self, obj):
+        if obj.player:
+            serializer = FootballPlayerSerializer(obj.player)
+            return serializer.data
+        else:
+            return None
 
 # Football team - return all
 class FootballTeamSerializer(serializers.ModelSerializer):

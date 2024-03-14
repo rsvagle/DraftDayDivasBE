@@ -6,7 +6,9 @@ urlpatterns = [
     path('drafted_teams/<int:id>', drafted_team_views.DraftedTeamView.as_view()),
 
     # News
-    path('news/', news_views.NewsArticleView.as_view()),
+    path('news/', news_views.NewsArticleListView.as_view()),
+    path('news/article/<int:id>', news_views.NewsArticleView.as_view()),
+
     path('injury-report/', news_views.InjuryReportArticleView.as_view()),
     
     # Auth/Registration

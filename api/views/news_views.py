@@ -14,10 +14,19 @@ from django.views.decorators.http import require_http_methods
 
 
 # All News Articles
-class NewsArticleView(generics.ListAPIView):
+class NewsArticleListView(generics.ListAPIView):
     queryset = NewsArticle.objects.all()
     serializer_class = NewsArticleSerializer
 
+# Specific News Article
+class NewsArticleView(APIView):
+    def get(self, request, id, format=None):
+        try:
+            article = NewsArticle.objects.get(id=id)
+            serializer = NewsArticleSerializer(article)
+            return Response(serializer.data)
+        except NewsArticle.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 # All Injury Reports
 class InjuryReportArticleView(generics.ListAPIView):
