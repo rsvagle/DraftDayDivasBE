@@ -27,8 +27,32 @@ class NewsArticleView(APIView):
             return Response(serializer.data)
         except NewsArticle.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        
+# Player News Articles
+class PlayerNewsArticlesView(generics.ListAPIView):
+    def get(self, request, id, format=None):
+
+        player = FootballPlayer.objects.get(id=id)
+        name = player.first_name + " " + player.last_name
+
+        try:
+            article = NewsArticle.objects.filter(article_content__contains=name).all()
+            serializer = NewsArticleSerializer(article, many=True)
+            return Response(serializer.data)
+        except NewsArticle.DoesNotExist:
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 # All Injury Reports
 class InjuryReportArticleView(generics.ListAPIView):
     queryset = InjuryReportArticle.objects.all()
     serializer_class = InjuryReportArticleSerializer
+
+# All Injury Reports
+class AllInjuryReportsForPlayerView(generics.ListAPIView):
+    def get(self, request, id, format=None):
+        try:
+            articles = InjuryReportArticle.objects.filter(player_id=id).all()
+            serializer = InjuryReportArticleSerializer(articles, many=True)
+            return Response(serializer.data)
+        except InjuryReportArticle.DoesNotExist:
+            return Response(status=status.HTTP_204_NO_CONTENT)

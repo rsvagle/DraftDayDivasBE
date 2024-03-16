@@ -39,19 +39,21 @@ def generate_player_seasons():
             season_receiving_yards = 0
             season_receiving_tds = 0
 
-            season_fgm = 0
+            season_fgm0_19 = 0
+            season_fgm20_39 = 0
+            season_fgm40_49 = 0
+            season_fgm50_plus = 0
+
             season_fga = 0
             season_xpm = 0
             season_xpa = 0
-
-            season_fantasy_points = 0
 
             match player.position:
                 case "QB":
                     season_passing_yards = random.randint(2500, 5000)
                     season_passing_tds = random.randint(16, 45)
                     season_passing_rating = 1
-                    season_ints = random.randint(4, 16)
+                    season_ints = random.randint(3,15)
                     season_fumbles = random.randint(0, 5)
                     season_fumbles_lost = random.randint(0, season_fumbles_lost)
                     season_rushing_yards = random.randint(0, 300)
@@ -77,10 +79,18 @@ def generate_player_seasons():
                     season_fumbles = random.randint(0, 2)
                     season_fumbles_lost = random.randint(0, season_fumbles)
                 case "K":
-                    season_fga = random.randint(22, 35)
-                    season_fgm = random.randint(season_fga // 2, season_fga)
+                    season_fgm0_19 = random.randint(2, 8)
+                    season_fgm20_39 = random.randint(5, 15)
+                    season_fgm40_49 = random.randint(5, 15)
+                    season_fgm50_plus = random.randint(0,8)
+
+                    total_fg = season_fgm0_19 + season_fgm20_39 + season_fgm40_49 + season_fgm50_plus
+                    random_fg_percentage = random.randint(70,100) / 100.0
+                    random_fg_inverse = 1 / random_fg_percentage
+
+                    season_fga = math.floor(total_fg*random_fg_inverse)
                     season_xpa = random.randint(30, 55)
-                    season_xpm = random.randint(math.floor(season_xpm * .8), season_xpm)
+                    season_xpm = random.randint(math.floor(season_xpa * .8), season_xpa)
                 case _:
                     pass
 
@@ -89,50 +99,32 @@ def generate_player_seasons():
                 id=id,
                 player=season_player,
                 team=season_team,
-                season=season_year,
+                year=season_year,
                 games_played = season_games_played,
-                season_passing_yards = season_passing_yards,
-                season_passing_tds = season_passing_tds,
-                season_passer_rating = season_passing_rating,
-                season_ints = season_ints,
-                season_fumbles = season_fumbles,
-                season_fumbles_lost = season_fumbles_lost,
-                season_safeties = season_safeties,
-                season_rushing_yards = season_rushing_yards,
-                season_rushing_tds = season_rushing_tds,
-                season_receptions = season_receptions,
-                season_receiving_yards = season_receiving_yards,
-                season_receiving_tds = season_receiving_tds,
-                season_fgm = season_fgm,
-                season_fga = season_fga,
-                season_xpm = season_xpm,
-                season_xpa = season_xpa,
-                season_fantasy_points = season_fantasy_points
+                passing_yards = season_passing_yards,
+                passing_tds = season_passing_tds,
+                passer_rating = season_passing_rating,
+                ints = season_ints,
+                fumbles = season_fumbles,
+                fumbles_lost = season_fumbles_lost,
+                safeties = season_safeties,
+                rushing_yards = season_rushing_yards,
+                rushing_tds = season_rushing_tds,
+                receptions = season_receptions,
+                receiving_yards = season_receiving_yards,
+                receiving_tds = season_receiving_tds,
+                fgm0_19 = season_fgm0_19,
+                fgm20_39 =  season_fgm20_39,
+                fgm40_49 =  season_fgm40_49,
+                fgm50_plus = season_fgm50_plus,
+                fga = season_fga,
+                xpm = season_xpm,
+                xpa = season_xpa,
             )
-
-            player_season_stats = calculate_fantasy_points(player_season_stats)
 
             all_seasons.append(player_season_stats)
     
     PlayerSeasonStats.objects.bulk_create(all_seasons)
-
-
-def calculate_fantasy_points(player_season_stats):
-    player_season_stats.season_fantasy_points = 0
-
-    player_season_stats.season_fantasy_points += player_season_stats.season_passing_yards * .04
-    player_season_stats.season_fantasy_points += player_season_stats.season_passing_tds * 4
-    player_season_stats.season_fantasy_points += player_season_stats.season_ints * -2
-    player_season_stats.season_fantasy_points += player_season_stats.season_fumbles_lost * -2
-    player_season_stats.season_fantasy_points += player_season_stats.season_rushing_yards * .1
-    player_season_stats.season_fantasy_points += player_season_stats.season_rushing_tds * 6
-    player_season_stats.season_fantasy_points += player_season_stats.season_receptions * .5
-    player_season_stats.season_fantasy_points += player_season_stats.season_receiving_yards * .1
-    player_season_stats.season_fantasy_points += player_season_stats.season_receiving_tds * 6
-    player_season_stats.season_fantasy_points += player_season_stats.season_fgm * 3
-    player_season_stats.season_fantasy_points += player_season_stats.season_xpm * 1
-
-    return player_season_stats
 
 if __name__ == "__main__":
     generate_player_seasons()

@@ -8,16 +8,16 @@ faker = Faker()
 def generate_players():
     positions = ["QB", "RB", "WR", "TE", "K"]
 
-    for id in range(2, 102):  # IDs from 2 to 101
-        first_name = faker.first_name()
+    for id in range(1, 151):  # IDs from 1 to 150
+        first_name = faker.first_name_male()
         last_name = faker.last_name()
         position = random.choice(positions)
         team_id = random.randint(1, 32)  # Assuming team IDs range from 1 to 32
         number = random.randint(1, 99)
         height = "{}'{}\"".format(random.randint(5, 6), random.randint(0, 11))  # Example: 5'10"
         weight = random.randint(150, 250)  # Weight in lbs
-        dob = faker.date_of_birth(minimum_age=22, maximum_age=40)  # Date of birth between ages 22 and 40
-        years_pro = random.randint(0, 22)  # Assuming a range for years pro
+        dob = faker.date_of_birth(minimum_age=23, maximum_age=40)  # Date of birth between ages 22 and 40
+        years_pro = (2024 - dob.year) - random.randint(21, 23)  # Assuming a range for years pro
         colleges = [
             "University of Alabama",
             "University of Southern California",
@@ -62,6 +62,3 @@ def generate_players():
             college=college,
             photo_url=photo_url,
         )
-
-# Generate 100 players
-generate_players()

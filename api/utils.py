@@ -10,7 +10,10 @@ def GetDefaultScoringParams():
         "receiving_yards": .1,
         "receiving_tds": 6,
         
-        "fgm": 3,
+        "fgm0_19": 3,
+        "fgm20_39": 3,
+        "fgm40_49": 4,
+        "fgm50_plus": 5,
         "xpm": 1
     }
     return scoring

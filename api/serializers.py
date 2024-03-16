@@ -77,7 +77,7 @@ class FootballPlayerSummarySerializer(serializers.ModelSerializer):
         fields = '__all__'
     
     def get_team(self, obj):
-        if self.context.get('include_team', False):
+        if self.context.get('include_team', True):
             from .serializers import FootballTeamSerializer  # Import here to avoid circular dependency
             serializer = FootballTeamSerializer(obj.team)
             return serializer.data
@@ -112,7 +112,10 @@ class FootballPlayerSummarySerializer(serializers.ModelSerializer):
         fantasy_points += season_stats.receiving_yards * scoring_params.get('receiving_yards', 0)
         fantasy_points += season_stats.receiving_tds * scoring_params.get('receiving_tds', 0)
 
-        fantasy_points += season_stats.fgm * scoring_params.get('fgm', 0)
+        fantasy_points += season_stats.fgm0_19 * scoring_params.get('fgm0_19', 0)
+        fantasy_points += season_stats.fgm20_39 * scoring_params.get('fgm20_39', 0)
+        fantasy_points += season_stats.fgm40_49 * scoring_params.get('fgm40_49', 0)
+        fantasy_points += season_stats.fgm50_plus * scoring_params.get('fgm50_plus', 0)
         fantasy_points += season_stats.xpm * scoring_params.get('xpm', 0)
         
         # Add other scoring calculations as needed

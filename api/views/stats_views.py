@@ -51,7 +51,10 @@ class GetTopPerformers(APIView):
             F('receiving_yards') * scoring_params['receiving_yards'] +
             F('receiving_tds') * scoring_params['receiving_tds'] +
 
-            F('fgm') * scoring_params['fgm'] +
+            F('fgm0_19') * scoring_params['fgm0_19'] +
+            F('fgm20_39') * scoring_params['fgm20_39'] +
+            F('fgm40_49') * scoring_params['fgm40_49'] +
+            F('fgm50_plus') * scoring_params['fgm50_plus'] +
             F('xpm') * scoring_params['xpm']
         ).order_by('-fantasy_points')
 

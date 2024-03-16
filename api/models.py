@@ -87,6 +87,9 @@ class FootballPlayer(models.Model):
     photo_url = models.CharField(max_length=200, default="", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
 class PlayerSeasonStats(models.Model):
     id = models.IntegerField(primary_key=True)
     player = models.ForeignKey(FootballPlayer, on_delete=models.CASCADE, related_name='season_stats')
@@ -110,13 +113,17 @@ class PlayerSeasonStats(models.Model):
     receiving_yards = models.IntegerField()
     receiving_tds = models.IntegerField()
 
-    fgm = models.IntegerField()
+    fgm0_19 = models.IntegerField()
+    fgm20_39 = models.IntegerField()
+    fgm40_49 = models.IntegerField()
+    fgm50_plus = models.IntegerField()
     fga = models.IntegerField()
+
     xpm = models.IntegerField()
     xpa = models.IntegerField()
 
     def __str__(self):
-        return f"{self.player.first_name} {self.player.last_name} - {self.season}"
+        return f"{self.player.first_name} {self.player.last_name} - {self.year}"
 
 class InjuryReportArticle(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -128,6 +135,9 @@ class InjuryReportArticle(models.Model):
     article_content = models.CharField(max_length=5000, default="")
     image_url = models.CharField(max_length=5000, default="")
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.title}"
 
 class FootballPlayerSummary:
     # Assuming this class is used purely for structuring data, not for creating a new table
