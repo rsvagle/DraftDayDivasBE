@@ -26,7 +26,7 @@ class PlayerSummaryView(APIView):
 # Get all players
 class FootballPlayersListView(generics.ListAPIView):
     queryset = FootballPlayer.objects.all()
-    serializer_class = FootballPlayerSerializer
+    serializer_class = FootballPlayerSummarySerializer
 
 
 # Get all player's stats for a given season
@@ -64,6 +64,16 @@ class FootballPlayerAllSeasonsView(APIView):
         try:
             player = FootballPlayer.objects.get(id=id)
             serializer = FootballPlayerAllSeasonsSerializer(player)
+            return Response(serializer.data)
+        except FootballPlayer.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+# Get all players for a team
+class TeamPlayersListView(generics.ListAPIView):
+    def get(self, request, id, format=None):
+        try:
+            queryset = FootballPlayer.objects.filter(team_id = id).all()
+            serializer = FootballPlayerSummarySerializer(queryset, many=True)
             return Response(serializer.data)
         except FootballPlayer.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)

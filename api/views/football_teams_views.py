@@ -16,3 +16,13 @@ from django.views.decorators.http import require_http_methods
 class FootballTeamsView(generics.ListAPIView):
     queryset = FootballTeam.objects.all()
     serializer_class = FootballTeamSerializer
+
+# Get a specific team
+class SingleFootballTeamView(APIView):
+    def get(self, request, id, format=None):
+        try:
+            team = FootballTeam.objects.get(id=id)
+            serializer = FootballTeamSerializer(team)
+            return Response(serializer.data)
+        except FootballTeam.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)

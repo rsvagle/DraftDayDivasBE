@@ -11,7 +11,8 @@ urlpatterns = [
     path('news/player/<int:id>/all/', news_views.PlayerNewsArticlesView.as_view()),
 
     path('injury-report/<int:id>/all/', news_views.AllInjuryReportsForPlayerView.as_view()),
-    path('injury-report/', news_views.InjuryReportArticleView.as_view()),
+    path('injury-report/', news_views.AllInjuryReportArticlesView.as_view()),
+    path('injury-report/<int:id>', news_views.InjuryReportArticleView.as_view()),
     
     # Auth/Registration
     path('login/', auth_views.login),
@@ -22,6 +23,9 @@ urlpatterns = [
 
     # Teams
     path('teams/', football_teams_views.FootballTeamsView.as_view()),
+    path('teams/<int:id>', football_teams_views.SingleFootballTeamView.as_view()),
+
+    path('teams/players/<int:id>', player_views.TeamPlayersListView.as_view()),
 
     # Players
     path('player/player-summary/<int:id>', player_views.PlayerSummaryView.as_view(), name='player-summary'),
