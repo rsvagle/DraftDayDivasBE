@@ -69,3 +69,28 @@ class GetTopPerformers(APIView):
 
         return Response(top_performers_data)
 
+
+
+class StatsSearchView(APIView):
+    serializer_class = PlayerSeasonStatsSerializer
+
+    def post(self, request, format=None):
+        # Extract filters from request data
+        selected_positions = request.data.get('selectedPositions', [])
+        selected_teams = request.data.get('selectedTeams', [])
+        selected_seasons = request.data.get('selectedSeasons', [])
+        
+        # Building the queryset based on the provided filters
+        # Note: Adjust the filter field names according to your actual model's field names
+        queryset = PlayerSeasonStats.objects.all()
+        
+        if selected_positions:
+            queryset = queryset.filter(player__position__in=selected_positions)
+        if selected_teams:
+            queryset = queryset.filter(player__team_id__in=selected_teams)
+        if selected_seasons:
+            queryset = queryset.filter(year__in=selected_seasons)
+        
+        # Serialize and return the filtered queryset
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)
