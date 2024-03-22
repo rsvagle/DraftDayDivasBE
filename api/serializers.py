@@ -72,6 +72,9 @@ class FootballPlayerSummarySerializer(serializers.ModelSerializer):
     team = serializers.SerializerMethodField()
     season_stats = serializers.SerializerMethodField()
 
+    projected_points = serializers.FloatField(read_only=True)
+    ranking = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = FootballPlayer
         fields = '__all__'
@@ -119,7 +122,7 @@ class FootballPlayerSummarySerializer(serializers.ModelSerializer):
         fantasy_points += season_stats.xpm * scoring_params.get('xpm', 0)
         
         # Add other scoring calculations as needed
-        return fantasy_points
+        return round(fantasy_points, 2)
 
 # Season statline for a player
 class PlayerSeasonStatsSerializer(serializers.ModelSerializer):

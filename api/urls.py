@@ -36,5 +36,6 @@ urlpatterns = [
     # Stats
     path('stats/<str:year>', stats_views.GetSeasonStatsListView.as_view()),
     path('stats/search/', stats_views.StatsSearchView.as_view()),
-    path('top-performers/', stats_views.GetTopPerformers.as_view())
+    path('top-performers/', stats_views.GetTopPerformers.as_view()),
+    path('rankings/', stats_views.RankingsView.as_view())
 ]

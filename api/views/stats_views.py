@@ -11,9 +11,13 @@ from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.views.decorators.http import require_http_methods
+from django.db.models import F, FloatField
+from django.db.models.functions import Cast
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from api.utils import GetDefaultScoringParams
 
 # Get all player stats for a given season
-# Pass in year
 class GetSeasonStatsListView(APIView):
     serializer_class = PlayerSeasonStatsSerializer
 
@@ -22,19 +26,15 @@ class GetSeasonStatsListView(APIView):
             # Filter the queryset based on the provided year
             queryset = PlayerSeasonStats.objects.filter(year=year).all()
         else:
-            # Optionally, handle the case where no year is provided, such as returning all objects or none
-            queryset = PlayerSeasonStats.objects.none()  # Example: Return an empty queryset
+            # Handle the case where no year is provided
+            queryset = PlayerSeasonStats.objects.none()
 
         # Serialize and return the filtered queryset
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
 
-from django.db.models import F, FloatField
-from django.db.models.functions import Cast
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from api.utils import GetDefaultScoringParams
 
+# Top performers - 1 of each position
 class GetTopPerformers(APIView):
     def get(self, request, *args, **kwargs):
         scoring_params = GetDefaultScoringParams()
@@ -70,9 +70,9 @@ class GetTopPerformers(APIView):
         return Response(top_performers_data)
 
 
-
+# Search for Stats Page
 class StatsSearchView(APIView):
-    serializer_class = PlayerSeasonStatsSerializer
+    serializer = PlayerSeasonStatsSerializer
 
     def post(self, request, format=None):
         # Extract filters from request data
@@ -80,8 +80,7 @@ class StatsSearchView(APIView):
         selected_teams = request.data.get('selectedTeams', [])
         selected_seasons = request.data.get('selectedSeasons', [])
         
-        # Building the queryset based on the provided filters
-        # Note: Adjust the filter field names according to your actual model's field names
+        # Building the queryset
         queryset = PlayerSeasonStats.objects.all()
         
         if selected_positions:
@@ -92,5 +91,26 @@ class StatsSearchView(APIView):
             queryset = queryset.filter(year__in=selected_seasons)
         
         # Serialize and return the filtered queryset
-        serializer = self.serializer_class(queryset, many=True)
+        serializer = self.serializer(queryset, many=True)
+        return Response(serializer.data)
+    
+
+class RankingsView(APIView):
+    def get(self, request):
+        players = FootballPlayer.objects.all()
+
+        # Generate a random float for each player and add it to the player's instance
+        for player in players:
+            setattr(player, 'projected_points', round(random.uniform(0, 25),2))
+
+        # Sort players by 'projected_points' in descending order
+        sorted_players = sorted(players, key=lambda x: x.projected_points, reverse=True)
+
+        # Add 'position' based on order in sorted list
+        for position, player in enumerate(sorted_players, start=1):
+            setattr(player, 'ranking', position)
+
+        # Since we've manually added attributes to the instances, ensure your serializer can handle them
+        # You might need to adjust FootballPlayerSummarySerializer to include 'projected_points' and 'position'
+        serializer = FootballPlayerSummarySerializer(sorted_players, many=True)
         return Response(serializer.data)

@@ -13,10 +13,24 @@ from rest_framework.permissions import IsAuthenticated
 from django.views.decorators.http import require_http_methods
 
 
-# All News Articles
 class NewsArticleListView(generics.ListAPIView):
-    queryset = NewsArticle.objects.all()
     serializer_class = NewsArticleSerializer
+
+    def get_queryset(self):
+        """
+        Optionally restricts the returned news articles to a given limit,
+        by filtering against a `limit` query parameter in the URL.
+        """
+        queryset = NewsArticle.objects.all()
+        limit = self.request.query_params.get('limit', None)
+        if limit is not None:
+            try:
+                limit = int(limit)
+                queryset = queryset[:limit]
+            except ValueError:
+                # Handle the case where limit is not an integer
+                pass
+        return queryset
 
 # Specific News Article
 class NewsArticleView(APIView):
