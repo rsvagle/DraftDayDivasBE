@@ -139,8 +139,8 @@ class InjuryReportArticle(models.Model):
     def __str__(self):
         return f"{self.title}"
 
+# This class is used purely for structuring data, not for creating a new table
 class FootballPlayerSummary:
-    # Assuming this class is used purely for structuring data, not for creating a new table
     def __init__(self, football_player):
         self.__dict__ = football_player.__dict__.copy()
         self.team_name = football_player.team.team_name
@@ -151,3 +151,41 @@ class FootballPlayerSummary:
         self.season_receiving_yards = randint(0, 500)
         self.season_receiving_tds = randint(0, 20)
         self.season_fantasy_points = randint(0, 500)
+
+
+class PlayerGameLog(models.Model):
+    id = models.IntegerField(primary_key=True)
+    player = models.ForeignKey(FootballPlayer, on_delete=models.CASCADE, related_name='game_log')
+    year = models.CharField(max_length=10)
+    team = models.ForeignKey(FootballTeam, on_delete=models.CASCADE, related_name='game_team')
+    week = models.IntegerField()
+    opponent = models.ForeignKey(FootballTeam, on_delete=models.CASCADE, related_name='game_opponent')
+    home = models.BooleanField()
+
+    passing_yards = models.IntegerField()
+    passing_tds = models.IntegerField()
+    passer_rating = models.FloatField()
+
+    ints = models.IntegerField()
+    fumbles = models.IntegerField()
+    fumbles_lost = models.IntegerField()
+    safeties = models.IntegerField()
+
+    rushing_yards = models.IntegerField()
+    rushing_tds = models.IntegerField()
+
+    receptions = models.IntegerField()
+    receiving_yards = models.IntegerField()
+    receiving_tds = models.IntegerField()
+
+    fgm0_19 = models.IntegerField()
+    fgm20_39 = models.IntegerField()
+    fgm40_49 = models.IntegerField()
+    fgm50_plus = models.IntegerField()
+    fga = models.IntegerField()
+
+    xpm = models.IntegerField()
+    xpa = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.player.first_name} {self.player.last_name} - {self.year} Wk {self.week}"
