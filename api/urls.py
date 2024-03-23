@@ -37,5 +37,8 @@ urlpatterns = [
     path('stats/<str:year>', stats_views.GetSeasonStatsListView.as_view()),
     path('stats/search/', stats_views.StatsSearchView.as_view()),
     path('top-performers/', stats_views.GetTopPerformers.as_view()),
-    path('rankings/', stats_views.RankingsView.as_view())
+    path('rankings/', stats_views.RankingsView.as_view()),
+
+    path('game-logs/<int:player_id>/<str:year>', stats_views.GetPlayerSeasonGameLogsView.as_view()),
+    path('game-logs/<int:player_id>/recent/', stats_views.GetPlayerRecentGameLogsView.as_view()),
 ]

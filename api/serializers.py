@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 
-from .models import DraftedTeam, FootballPlayer, FootballTeam, InjuryReportArticle, PlayerSeasonStats
+from .models import DraftedTeam, FootballPlayer, FootballTeam, InjuryReportArticle, PlayerGameLog, PlayerSeasonStats
 from .models import NewsArticle
 
 # Drafted Team
@@ -161,4 +161,27 @@ class FootballPlayerAllSeasonsSerializer(serializers.ModelSerializer):
         # Fetch all season stats for the player
         season_stats = obj.season_stats.all().order_by('-year')
         serializer = PlayerSeasonStatsSerializer(season_stats, many=True)
+        return serializer.data
+    
+
+# Season statline for a player
+class PlayerGameLogSerializer(serializers.ModelSerializer):
+    team = serializers.SerializerMethodField()
+    opponent = serializers.SerializerMethodField()
+    player = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = PlayerGameLog
+        fields = '__all__'
+
+    def get_team(self, obj):
+        serializer = FootballTeamSerializer(obj.team)
+        return serializer.data
+    
+    def get_opponent(self, obj):
+        serializer = FootballTeamSerializer(obj.opponent)
+        return serializer.data
+    
+    def get_player(self, obj):
+        serializer = FootballPlayerSerializer(obj.player)
         return serializer.data

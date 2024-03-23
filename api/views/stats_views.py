@@ -114,3 +114,36 @@ class RankingsView(APIView):
         # You might need to adjust FootballPlayerSummarySerializer to include 'projected_points' and 'position'
         serializer = FootballPlayerSummarySerializer(sorted_players, many=True)
         return Response(serializer.data)
+
+
+# Get all player game logs for a given season
+class GetPlayerSeasonGameLogsView(APIView):
+    serializer_class = PlayerGameLogSerializer
+
+    def get(self, request, player_id, year, format=None):
+        if year is not None:
+            # Filter the queryset based on the provided year
+            queryset = PlayerGameLog.objects.filter(player__id=player_id, year=year).all()
+        else:
+            # Handle the case where no year is provided
+            queryset = PlayerGameLog.objects.none()
+
+        # Serialize and return the filtered queryset
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)
+    
+# Get Recent Game Logs For Player
+class GetPlayerRecentGameLogsView(APIView):
+    serializer_class = PlayerGameLogSerializer
+
+    def get(self, request, player_id, format=None):
+        if player_id is not None:
+            # Filter the queryset based on the provided year
+            queryset = PlayerGameLog.objects.filter(player__id=player_id).order_by('-year', '-week')[:4]
+        else:
+            # Handle the case where no year is provided
+            queryset = PlayerGameLog.objects.none()
+
+        # Serialize and return the filtered queryset
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)
