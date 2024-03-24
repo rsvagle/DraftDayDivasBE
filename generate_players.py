@@ -10,7 +10,7 @@ faker = Faker()
 
 def generate_players():
     positions = ["QB", "RB", "WR", "TE", "K"]
-    positions_no_k = ["RB", "WR", "TE"]
+    positions_skill = ["RB", "WR", "WR", "TE"]
     id_index = 1
     teams = FootballTeam.objects.all()
 
@@ -74,18 +74,17 @@ def generate_players():
             id_index += 1
 
     for team in teams:
-        for id in range(1, 4):
+        for position in positions_skill:
             id=id_index
             first_name = faker.first_name_male()
             last_name = faker.last_name()
-            position = random.choice(positions_no_k)
-            team_id = random.randint(1, 32)  # Assuming team IDs range from 1 to 32
+            position = position
             number = random.randint(1, 99)
             height = "{}'{}\"".format(random.randint(5, 6), random.randint(0, 11))  # Example: 5'10"
             weight = random.randint(150, 250)  # Weight in lbs
-            random_age = min(40,max(22,math.floor(np.random.normal(27, 4, 1))))
+            random_age = min(36,max(22,math.floor(np.random.normal(27, 4, 1))))
             dob = faker.date_of_birth(minimum_age=random_age, maximum_age=random_age)
-            years_pro = max(1,(2024 - dob.year) - random.randint(21, 23))  # Assuming a range for years pro
+            years_pro = max(0,(2024 - dob.year) - random.randint(21, 23))  # Assuming a range for years pro
             colleges = [
                 "University of Alabama",
                 "University of Southern California",
@@ -121,7 +120,7 @@ def generate_players():
                 first_name=first_name,
                 last_name=last_name,
                 position=position,
-                team=teams[team_id-1],
+                team=team,
                 number=number,
                 height=height,
                 weight=weight,

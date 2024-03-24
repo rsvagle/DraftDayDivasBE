@@ -21,4 +21,4 @@ def gen_db():
     generate_players()
     generate_player_game_logs()
     generate_injury_report_articles(150)
-    generate_news_articles(75)
+    generate_news_articles(25)

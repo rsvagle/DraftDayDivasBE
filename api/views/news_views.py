@@ -21,15 +21,16 @@ class NewsArticleListView(generics.ListAPIView):
         Optionally restricts the returned news articles to a given limit,
         by filtering against a `limit` query parameter in the URL.
         """
-        queryset = NewsArticle.objects.all()
         limit = self.request.query_params.get('limit', None)
         if limit is not None:
             try:
                 limit = int(limit)
-                queryset = queryset[:limit]
+                queryset = NewsArticle.objects.order_by('-created_at')[:limit]
             except ValueError:
                 # Handle the case where limit is not an integer
                 pass
+        else:
+            queryset = NewsArticle.objects.order_by('-created_at').all()
         return queryset
 
 # Specific News Article
