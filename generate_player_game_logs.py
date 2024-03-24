@@ -18,7 +18,12 @@ def generate_player_game_logs():
     game_id_index = 1
 
     for player in players:
-        print(player.first_name, player.years_pro)
+
+        bias = 0.6 # Add a boost for starters
+
+        if(player.id <= 160):
+            bias = max(1,np.random.normal(1.25, 0.25, 1))
+
         # For every year pro, make a season
         for year in range(0, player.years_pro):
             year_game_logs = []
@@ -30,8 +35,8 @@ def generate_player_game_logs():
             season_player = player
             season_team = player.team
             season_year = 2024-year
-            season_games_played = 16
 
+            season_games_played = 0
             season_passing_yards = 0
             season_passing_tds = 0
             season_passing_rating = 0
@@ -72,7 +77,7 @@ def generate_player_game_logs():
                     opponent_id = random.randint(1, 32)
 
                 opponent = FootballTeam.objects.get(id=opponent_id)
-
+                
                 passing_yards = 0
                 passing_tds = 0
                 passing_rating = 0
@@ -101,8 +106,8 @@ def generate_player_game_logs():
                 # Create game stats
                 match player.position:
                     case "QB":
-                        passing_yards = math.floor(np.random.normal(275, 50, 1))
-                        passing_tds = math.floor(np.random.normal(2.5, 0.5, 1))
+                        passing_yards = math.floor(np.random.normal(200*bias, 25*bias, 1))
+                        passing_tds = math.floor(np.random.normal(1.75*bias, 0.5, 1))
                         passing_rating = 1
                         ints = max(math.floor(np.random.normal(0.5, 0.5, 1)),0)
                         fumbles = max(math.floor(np.random.normal(0.25, 0.5, 1)),0)
@@ -110,23 +115,23 @@ def generate_player_game_logs():
                         rushing_yards = max(math.floor(np.random.normal(12, 12, 1)),0)
                         rushing_tds = max(math.floor(np.random.normal(0.25, 0.5, 1)),0)
                     case "RB":
-                        rushing_yards = max(math.floor(np.random.normal(85, 35, 1)),0)
-                        rushing_tds = max(math.floor(np.random.normal(0.5, 0.5, 1)),0)
+                        rushing_yards = max(math.floor(np.random.normal(58*bias, 35, 1)),0)
+                        rushing_tds = max(math.floor(np.random.normal(0.6, 0.8, 1)),0)
                         fumbles = max(math.floor(np.random.normal(0.2, 0.5, 1)),0)
                         fumbles_lost = random.randint(0, fumbles)
                         receptions = random.randint(0, 5)
                         receiving_yards = max(math.floor(np.random.normal(15, 15, 1)),0)
                         receiving_tds = max(math.floor(np.random.normal(0.3, 0.5, 1)),0)
                     case "WR":                
-                        receptions = max(math.floor(np.random.normal(5, 2, 1)),0)
-                        receiving_yards = receptions * max(math.floor(np.random.normal(10.5, 4, 1)),4)
-                        receiving_tds = max(math.floor(np.random.normal(0.5, 0.5, 1)),0)
+                        receptions = max(math.floor(np.random.normal(3.5*bias, 2, 1)),0)
+                        receiving_yards = receptions * max(math.floor(np.random.normal(8*bias, 5, 1)),4)
+                        receiving_tds = max(math.floor(np.random.normal(0.6, 0.8, 1)),0)
                         fumbles = max(math.floor(np.random.normal(0.1, 0.25, 1)),0)
                         fumbles_lost = random.randint(0, fumbles)
                     case "TE":
-                        receptions = max(math.floor(np.random.normal(3, 1, 1)),0)
-                        receiving_yards = receptions * max(math.floor(np.random.normal(10.5, 4, 1)),4)
-                        receiving_tds = max(math.floor(np.random.normal(0.5, 0.5, 1)),0)
+                        receptions = max(math.floor(np.random.normal(2.7*bias, 1.5, 1)),0)
+                        receiving_yards = receptions * max(math.floor(np.random.normal(7*bias, 4, 1)),4)
+                        receiving_tds = max(math.floor(np.random.normal(0.6, 0.7, 1)),0)
                         fumbles = max(math.floor(np.random.normal(0.05, 0.25, 1)),0)
                         fumbles_lost = random.randint(0, fumbles)
                     case "K":
@@ -143,7 +148,7 @@ def generate_player_game_logs():
                         fga = total_fg+fgmissed
 
                         xpm = max(0,math.floor(np.random.normal(2.5, 0.5, 1)))
-                        xpmissed = max(math.floor(np.random.normal(0.05, 0.25, 1)),0)
+                        xpmissed = max(math.floor(np.random.normal(0.2, 0.25, 1)),0)
                         xpa = xpm + xpmissed
                     case _:
                         pass

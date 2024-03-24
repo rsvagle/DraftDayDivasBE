@@ -15,7 +15,7 @@ from django.db.models import F, FloatField
 from django.db.models.functions import Cast
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from api.utils import GetDefaultScoringParams
+from api.utils import GetDefaultScoringParams, calc_game_f_points
 
 # Get all player stats for a given season
 class GetSeasonStatsListView(APIView):
@@ -39,7 +39,7 @@ class GetTopPerformers(APIView):
     def get(self, request, *args, **kwargs):
         scoring_params = GetDefaultScoringParams()
 
-        annotated_stats = PlayerSeasonStats.objects.select_related('player').annotate(
+        annotated_stats = PlayerSeasonStats.objects.filter(year='2024').select_related('player').annotate(
             fantasy_points=Cast(0, FloatField()) +
             F('passing_yards') * scoring_params['passing_yards'] +
             F('passing_tds') * scoring_params['passing_tds'] +
@@ -101,7 +101,14 @@ class RankingsView(APIView):
 
         # Generate a random float for each player and add it to the player's instance
         for player in players:
-            setattr(player, 'projected_points', round(random.uniform(0, 25),2))
+            player_game_logs = PlayerGameLog.objects.filter(player=player).order_by('-year','-week')[:4]
+            
+            # Calculate points (average of last 4 games)
+            total_points_last_4 = 0.0
+            for game in player_game_logs:
+                setattr(game, 'points', calc_game_f_points(game, GetDefaultScoringParams()))
+                total_points_last_4 += game.points
+            setattr(player, 'projected_points', round(total_points_last_4/4,2))
 
         # Sort players by 'projected_points' in descending order
         sorted_players = sorted(players, key=lambda x: x.projected_points, reverse=True)
