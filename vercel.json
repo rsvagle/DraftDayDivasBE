@@ -3,7 +3,7 @@
     "src": "draft_day_divas/wsgi.py",
     "use": "@vercel/python",
     "config": {
-      "pythonVersion": "3.12"
+      "pythonVersion": "3.9"
     }
   }],
   "routes": [
