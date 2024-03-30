@@ -138,7 +138,7 @@ def generate_player_game_logs():
                     # Create game stats
                     match player.position:
                         case "QB":
-                            passing_yards = math.floor(np.random.normal(200*bias, 25*bias, 1))
+                            passing_yards = math.floor(np.random.normal(min(300,200*bias), 25*bias, 1))
                             passing_tds = math.floor(np.random.normal(1.75*bias, 0.5, 1))
                             passing_rating = 1
                             ints = max(math.floor(np.random.normal(0.5, 0.5, 1)),0)
