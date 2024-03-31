@@ -1,10 +1,10 @@
 {
     "version": 2,
     "builds": [
-      { "src": "../draft_day_divas/wsgi.py", "use": "@vercel/python" }
+      { "src": "draft_day_divas/wsgi.py", "use": "@vercel/python" }
     ],
     "routes": [
-      { "src": "/(.*)", "dest": "../draft_day_divas/wsgi.py" }
+      { "src": "/(.*)", "dest": "draft_day_divas/wsgi.py" }
     ]
 }
   
