@@ -42,8 +42,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'api',
-    'draft_day_divas'
 ]
 
 MIDDLEWARE = [
