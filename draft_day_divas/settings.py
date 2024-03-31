@@ -80,7 +80,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://draft-day-divas.vercel.app",
 ]
 
-CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
