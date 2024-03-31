@@ -75,10 +75,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'draft_day_divas.wsgi.app'
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:4200",  # Angular app
-]
-
 CORS_ORIGIN_ALLOW_ALL = True
 
 # Database
