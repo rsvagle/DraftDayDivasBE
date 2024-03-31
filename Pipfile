@@ -11,6 +11,7 @@ django-extensions = "*"
 django-filter = "*"
 djangorestframework-jsonapi = "*"
 python-dotenv = "*"
+psycopg2 = "*"
 
 [dev-packages]
 
