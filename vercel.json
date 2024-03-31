@@ -1,6 +1,6 @@
 {
     "builds": [
-      { "src": "draft_day_divas/wsgi.py", "use": "@vercel/python" }
+      { "src": "draft_day_divas/wsgi.py", "use": "@ardnt/vercel-python-wsgi" }
     ],
     "routes": [
       { "src": "/(.*)", "dest": "draft_day_divas/wsgi.py" }
