@@ -1,13 +1,13 @@
 {
   "builds": [{
-    "src": "./draft_day_divas/wsgi.py",
+    "src": "draft_day_divas/wsgi.py",
     "use": "@vercel/python",
     "config": {"pythonVersion": "3.9" }
   }],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "./draft_day_divas/wsgi.py"
+      "dest": "draft_day_divas/wsgi.py"
     }
   ]
 }

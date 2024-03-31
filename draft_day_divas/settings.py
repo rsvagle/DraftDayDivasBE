@@ -73,7 +73,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'draft_day_divas.wsgi.app'
+WSGI_APPLICATION = 'vercel_app.wsgi.app'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",  # Angular app
