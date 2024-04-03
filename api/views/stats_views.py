@@ -99,7 +99,7 @@ class RankingsView(APIView):
     def get(self, request):
         players = FootballPlayer.objects.all()
 
-        # Generate a random float for each player and add it to the player's instance
+        # Average the player's last 4 weeks as their projection
         for player in players:
             player_game_logs = PlayerGameLog.objects.filter(player=player).order_by('-year','-week')[:4]
             
