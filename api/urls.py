@@ -41,4 +41,10 @@ urlpatterns = [
 
     path('game-logs/<int:player_id>/<str:year>', stats_views.GetPlayerSeasonGameLogsView.as_view()),
     path('game-logs/<int:player_id>/recent/', stats_views.GetPlayerRecentGameLogsView.as_view()),
+
+    # Mock drafts
+    # Select player
+    # Get results
+    # Get mock draft setup
+    #
 ]

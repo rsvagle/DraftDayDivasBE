@@ -111,14 +111,12 @@ class RankingsView(APIView):
             setattr(player, 'projected_points', round(total_points_last_4/4,2))
 
         # Sort players by 'projected_points' in descending order
-        sorted_players = sorted(players, key=lambda x: x.projected_points, reverse=True)
+        sorted_players = sorted(players, key=lambda x: x.projected_points, reverse=True)[:150]
 
         # Add 'position' based on order in sorted list
         for position, player in enumerate(sorted_players, start=1):
             setattr(player, 'ranking', position)
 
-        # Since we've manually added attributes to the instances, ensure your serializer can handle them
-        # You might need to adjust FootballPlayerSummarySerializer to include 'projected_points' and 'position'
         serializer = FootballPlayerSummarySerializer(sorted_players, many=True)
         return Response(serializer.data)
 

@@ -189,3 +189,39 @@ class PlayerGameLog(models.Model):
 
     def __str__(self):
         return f"{self.player.first_name} {self.player.last_name} - {self.year} Wk {self.week}"
+    
+
+
+
+class WeeklyPrediction(models.Model):
+    id = models.IntegerField(primary_key=True)
+    player = models.ForeignKey(FootballPlayer, on_delete=models.CASCADE, related_name='weekly_pred')
+
+    passing_yards = models.IntegerField()
+    passing_tds = models.IntegerField()
+    passer_rating = models.FloatField()
+
+    ints = models.IntegerField()
+    fumbles_lost = models.IntegerField()
+
+    rushing_yards = models.IntegerField()
+    rushing_tds = models.IntegerField()
+
+    receptions = models.IntegerField()
+    receiving_yards = models.IntegerField()
+    receiving_tds = models.IntegerField()
+
+    fgm0_19 = models.IntegerField()
+    fgm20_39 = models.IntegerField()
+    fgm40_49 = models.IntegerField()
+    fgm50_plus = models.IntegerField()
+    fga = models.IntegerField()
+
+    xpm = models.IntegerField()
+    xpa = models.IntegerField()
+
+    standard_points= models.FloatField()
+    ppr_points= models.FloatField()
+    half_ppr_points= models.FloatField()
+
+    prediction_comment = models.CharField()
