@@ -1,4 +1,26 @@
-def GetDefaultScoringParams():
+# No PPR scoring params
+def GetNoPPRScoringParams():
+    scoring = {
+        "passing_yards": .04,
+        "passing_tds": 4,
+
+        "rushing_yards": .1,
+        "rushing_tds": 6,
+
+        "receptions" : 0,
+        "receiving_yards": .1,
+        "receiving_tds": 6,
+        
+        "fgm0_19": 3,
+        "fgm20_39": 3,
+        "fgm40_49": 4,
+        "fgm50_plus": 5,
+        "xpm": 1
+    }
+    return scoring
+
+# Half point PPR scoring params
+def GetHalfPPRScoringParams():
     scoring = {
         "passing_yards": .04,
         "passing_tds": 4,
@@ -18,6 +40,28 @@ def GetDefaultScoringParams():
     }
     return scoring
 
+# PPR scoring params
+def GetPPRScoringParams():
+    scoring = {
+        "passing_yards": .04,
+        "passing_tds": 4,
+
+        "rushing_yards": .1,
+        "rushing_tds": 6,
+
+        "receptions" : 1,
+        "receiving_yards": .1,
+        "receiving_tds": 6,
+        
+        "fgm0_19": 3,
+        "fgm20_39": 3,
+        "fgm40_49": 4,
+        "fgm50_plus": 5,
+        "xpm": 1
+    }
+    return scoring
+
+# Calculate fantasy points for the stat totals based on the scoring params given
 def calc_game_f_points(game_log, scoring_params):
     fantasy_points = 0
     fantasy_points += game_log.passing_yards * scoring_params.get('passing_yards', 0)

@@ -12,6 +12,7 @@ from rest_framework.authentication import SessionAuthentication, TokenAuthentica
 from rest_framework.permissions import IsAuthenticated
 from django.views.decorators.http import require_http_methods
 
+
 # Get player and the latest season
 class PlayerSummaryView(APIView):
     def get(self, request, id, format=None):
@@ -67,6 +68,7 @@ class FootballPlayerAllSeasonsView(APIView):
             return Response(serializer.data)
         except FootballPlayer.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        
         
 # Get all players for a team
 class TeamPlayersListView(generics.ListAPIView):

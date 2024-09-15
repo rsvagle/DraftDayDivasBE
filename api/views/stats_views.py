@@ -15,7 +15,7 @@ from django.db.models import F, FloatField
 from django.db.models.functions import Cast
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from api.utils import GetDefaultScoringParams, calc_game_f_points
+from api.utils import GetHalfPPRScoringParams, calc_game_f_points
 
 # Get all player stats for a given season
 class GetSeasonStatsListView(APIView):
@@ -37,7 +37,7 @@ class GetSeasonStatsListView(APIView):
 # Top performers - 1 of each position
 class GetTopPerformers(APIView):
     def get(self, request, *args, **kwargs):
-        scoring_params = GetDefaultScoringParams()
+        scoring_params = GetHalfPPRScoringParams()
 
         annotated_stats = PlayerSeasonStats.objects.filter(year='2024').select_related('player').annotate(
             fantasy_points=Cast(0, FloatField()) +
@@ -95,6 +95,7 @@ class StatsSearchView(APIView):
         return Response(serializer.data)
     
 
+# Get player rankings
 class RankingsView(APIView):
     def get(self, request):
         players = FootballPlayer.objects.all()
@@ -106,7 +107,7 @@ class RankingsView(APIView):
             # Calculate points (average of last 4 games)
             total_points_last_4 = 0.0
             for game in player_game_logs:
-                setattr(game, 'points', calc_game_f_points(game, GetDefaultScoringParams()))
+                setattr(game, 'points', calc_game_f_points(game, GetHalfPPRScoringParams()))
                 total_points_last_4 += game.points
             setattr(player, 'projected_points', round(total_points_last_4/4,2))
 
@@ -137,7 +138,8 @@ class GetPlayerSeasonGameLogsView(APIView):
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
     
-# Get Recent Game Logs For Player
+
+# Get Recent Game Logs (Last 4) For Player
 class GetPlayerRecentGameLogsView(APIView):
     serializer_class = PlayerGameLogSerializer
 

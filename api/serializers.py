@@ -64,7 +64,7 @@ class FootballPlayerSerializer(serializers.ModelSerializer):
                 return serializer.data
         return None
 
-from .utils import GetDefaultScoringParams
+from .utils import GetHalfPPRScoringParams
 
 # Player summary
 # Pulls team and latest season
@@ -96,7 +96,7 @@ class FootballPlayerSummarySerializer(serializers.ModelSerializer):
             data = serializer.data
             
             # Calculate fantasy points
-            scoring_params = self.context.get('scoring_params', GetDefaultScoringParams())
+            scoring_params = self.context.get('scoring_params', GetHalfPPRScoringParams())
             fantasy_points = self.calculate_fantasy_points(season_stats, scoring_params)
             data['fantasy_points'] = fantasy_points  # Add fantasy points to the serialized data
             

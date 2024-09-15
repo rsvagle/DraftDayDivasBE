@@ -12,6 +12,7 @@ from rest_framework.authentication import SessionAuthentication, TokenAuthentica
 from rest_framework.permissions import IsAuthenticated
 from django.views.decorators.http import require_http_methods
 
+
 # Login
 @api_view(['POST'])
 def login(request):
@@ -30,6 +31,7 @@ def login(request):
     serializer = UserSerializer(instance=user)
     return Response({"token": token.key, "user": serializer.data})
 
+
 # Signup
 @api_view(['POST'])
 def signup(request):
@@ -44,6 +46,7 @@ def signup(request):
         return Response({"token":token.key, "user": serializer.data})
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 # Test token
 @api_view(['GET'])
@@ -61,26 +64,21 @@ def get_user_profile(request):
     # Access the user directly from request.user
     user = request.user
 
-    # Now, you can use the user object to access any user information, such as username or user id
+    # Get data from user
     user_id = user.id
     username = user.username
     email = user.email
 
-    # Fetch additional user information from your database if needed
-    # For example, you might have a UserProfile model associated with your User model
-    # user_profile = UserProfile.objects.get(user=user)
-
-    # Construct your response with the user information
     response_data = {
         "user_id": user_id,
         "username": username,
         "email": email,
         "first_name": user.first_name,
         "last_name": user.last_name
-        # Include other user details as needed
     }
 
     return Response(response_data)
+
 
 # Save profile
 @api_view(['POST'])
@@ -88,7 +86,7 @@ def get_user_profile(request):
 @permission_classes([IsAuthenticated])
 def save_user_profile(request):
     # Save/update profile logic
-    user = User.objects.get(id=request.user.id)  # Example, adjust accordingly
+    user = User.objects.get(id=request.user.id)
 
     user.email = request.data['email']
     user.username = request.data['username']

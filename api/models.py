@@ -30,12 +30,14 @@ def generate_unique_teamname():
         
         return teamName
 
+# A team that's been drafted
 class DraftedTeam(models.Model):
     id = models.IntegerField(primary_key=True)
     user_id = models.IntegerField()
     team_name = models.CharField(max_length=60, default="")
     created_at = models.DateTimeField(auto_now_add=True)
 
+# News article model
 class NewsArticle(models.Model):
     id = models.IntegerField(primary_key=True)
     author = models.CharField(max_length=60, default="")
@@ -46,6 +48,7 @@ class NewsArticle(models.Model):
     image_url = models.CharField(max_length=5000, default="")
     created_at = models.DateTimeField(auto_now_add=True)
 
+# NFL Team model
 class FootballTeam(models.Model):
     id = models.IntegerField(primary_key=True)
     team_name = models.CharField(max_length=60, default="")
@@ -72,6 +75,7 @@ class FootballTeam(models.Model):
     official_website_url = models.CharField(max_length=200, default="")
     created_at = models.DateTimeField(auto_now_add=True)
 
+# Player model with cetegorical info
 class FootballPlayer(models.Model):
     id = models.IntegerField(primary_key=True)
     first_name = models.CharField(max_length=60, default="")
@@ -90,6 +94,7 @@ class FootballPlayer(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
+# Stats for an entire season
 class PlayerSeasonStats(models.Model):
     id = models.IntegerField(primary_key=True)
     player = models.ForeignKey(FootballPlayer, on_delete=models.CASCADE, related_name='season_stats')
@@ -125,6 +130,7 @@ class PlayerSeasonStats(models.Model):
     def __str__(self):
         return f"{self.player.first_name} {self.player.last_name} - {self.year}"
 
+# Injury reports
 class InjuryReportArticle(models.Model):
     id = models.IntegerField(primary_key=True)
     author = models.CharField(max_length=60, default="")
@@ -152,7 +158,7 @@ class FootballPlayerSummary:
         self.season_receiving_tds = randint(0, 20)
         self.season_fantasy_points = randint(0, 500)
 
-
+# Game log for a player
 class PlayerGameLog(models.Model):
     id = models.IntegerField(primary_key=True)
     player = models.ForeignKey(FootballPlayer, on_delete=models.CASCADE, related_name='game_log')
@@ -191,8 +197,8 @@ class PlayerGameLog(models.Model):
         return f"{self.player.first_name} {self.player.last_name} - {self.year} Wk {self.week}"
     
 
-
-
+# A weekly prediction with stats for a given player.
+# Also contains points calculation for the stats, as well as a comment explaining the prediction
 class WeeklyPrediction(models.Model):
     id = models.IntegerField(primary_key=True)
     player = models.ForeignKey(FootballPlayer, on_delete=models.CASCADE, related_name='weekly_pred')

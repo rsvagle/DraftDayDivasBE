@@ -13,14 +13,11 @@ from rest_framework.permissions import IsAuthenticated
 from django.views.decorators.http import require_http_methods
 
 
+# Get the last X news articles
 class NewsArticleListView(generics.ListAPIView):
     serializer_class = NewsArticleSerializer
 
     def get_queryset(self):
-        """
-        Optionally restricts the returned news articles to a given limit,
-        by filtering against a `limit` query parameter in the URL.
-        """
         limit = self.request.query_params.get('limit', None)
         if limit is not None:
             try:
@@ -33,6 +30,7 @@ class NewsArticleListView(generics.ListAPIView):
             queryset = NewsArticle.objects.order_by('-created_at').all()
         return queryset
 
+
 # Specific News Article
 class NewsArticleView(APIView):
     def get(self, request, id, format=None):
@@ -43,6 +41,7 @@ class NewsArticleView(APIView):
         except NewsArticle.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         
+
 # Player News Articles
 class PlayerNewsArticlesView(generics.ListAPIView):
     def get(self, request, id, format=None):
@@ -57,12 +56,14 @@ class PlayerNewsArticlesView(generics.ListAPIView):
         except NewsArticle.DoesNotExist:
             return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 # All Injury Reports
 class AllInjuryReportArticlesView(generics.ListAPIView):
     queryset = InjuryReportArticle.objects.all()
     serializer_class = InjuryReportArticleSerializer
 
-# All Injury Reports
+
+# All Injury Reports for a given player
 class AllInjuryReportsForPlayerView(generics.ListAPIView):
     def get(self, request, id, format=None):
         try:
@@ -72,7 +73,8 @@ class AllInjuryReportsForPlayerView(generics.ListAPIView):
         except InjuryReportArticle.DoesNotExist:
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-# Individual Injury Report
+
+# Specific Injury Report article
 class InjuryReportArticleView(APIView):
     def get(self, request, id, format=None):
         try:

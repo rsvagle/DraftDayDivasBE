@@ -12,10 +12,12 @@ from rest_framework.authentication import SessionAuthentication, TokenAuthentica
 from rest_framework.permissions import IsAuthenticated
 from django.views.decorators.http import require_http_methods
 
+
 # Get all football teams 
 class FootballTeamsView(generics.ListAPIView):
     queryset = FootballTeam.objects.all()
     serializer_class = FootballTeamSerializer
+
 
 # Get a specific team
 class SingleFootballTeamView(APIView):
