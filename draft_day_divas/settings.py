@@ -30,6 +30,7 @@ ALLOWED_HOSTS = ['.vercel.app','now.sh','127.0.0.1','localhost']
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -73,7 +74,14 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'draft_day_divas.wsgi.app'
+# WSGI_APPLICATION = 'draft_day_divas.wsgi.app'
+
+ASGI_APPLICATION = 'draft_day_divas.asgi.application'
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",  # Use Redis for production
+    },
+}
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",
