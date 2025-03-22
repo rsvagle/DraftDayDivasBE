@@ -231,3 +231,26 @@ class WeeklyPrediction(models.Model):
     half_ppr_points= models.FloatField()
 
     prediction_comment = models.CharField()
+
+# class FantasyDraft(models.Model):
+#     id = models.IntegerField(primary_key=True)
+#     number_teams = models.IntegerField()
+#     teams_joined = models.IntegerField()
+#     has_started = models.BooleanField()
+#     has_finished = models.BooleanField()
+
+# class FantasyDraftTeam(models.Model):
+#     id = models.IntegerField(primary_key=True)
+#     user = models.ForeignKey(models.User, on_delete=models.CASCADE, related_name='draft_team_user')
+#     draft = models.ForeignKey(FantasyDraft, on_delete=models.CASCADE, related_name='draft_team')
+#     team_name  = models.CharField()
+#     draft_position = models.IntegerField()
+#     created_at = models.DateTimeField(auto_now_add=True)
+
+# class FantasyDraftSelection(models.Model):
+#     id = models.IntegerField(primary_key=True)
+#     user = models.ForeignKey(models.User, on_delete=models.CASCADE, related_name='draft_selection_team_user')
+#     draft = models.ForeignKey(FantasyDraft, on_delete=models.CASCADE, related_name='draft_selection_draft')
+#     team = models.ForeignKey(FantasyDraftTeam, on_delete=models.CASCADE, related_name='draft_selection_team')
+#     player = models.ForeignKey(FootballPlayer, on_delete=models.CASCADE, related_name='draft_selection_player')
+#     pick_number =  models.IntegerField()

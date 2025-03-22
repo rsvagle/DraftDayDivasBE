@@ -20,7 +20,7 @@ urlpatterns = [
     path('signup/', auth_views.signup),
     path('test_token/', auth_views.test_token),
     path('profile/', auth_views.get_user_profile),
-    path('save_profile/', auth_views.save_user_profile),
+    path('profile/save_profile/', auth_views.save_user_profile),
 
     # Teams
     path('teams/', football_teams_views.FootballTeamsView.as_view()),
