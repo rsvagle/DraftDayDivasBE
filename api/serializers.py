@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 
 from .models import DraftedTeam, FootballPlayer, FootballTeam, InjuryReportArticle, PlayerGameLog, PlayerSeasonStats
-from .models import NewsArticle
+from .models import NewsArticle, FantasyDraft, FantasyDraftTeam
 
 # Drafted Team
 class DraftedTeamSerializer(serializers.ModelSerializer):
@@ -206,3 +206,16 @@ def calc_game_f_points(game_log, scoring_params):
     fantasy_points += game_log.xpm * scoring_params.get('xpm', 0)
 
     return fantasy_points
+
+
+class FantasyDraftTeamSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FantasyDraftTeam
+        fields = '__all__'
+
+class FantasyDraftSerializer(serializers.ModelSerializer):
+    draft_teams = FantasyDraftTeamSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = FantasyDraft
+        fields = '__all__'

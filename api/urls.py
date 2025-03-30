@@ -1,9 +1,9 @@
 from django.urls import path
-from api.views import football_teams_views, auth_views, news_views, drafted_team_views, player_views, stats_views
+from api.views import football_teams_views, auth_views, news_views, mock_draft_views, player_views, stats_views
 
 urlpatterns = [
     # User drafted team
-    path('drafted_teams/<int:id>', drafted_team_views.DraftedTeamView.as_view()),
+    path('drafted_teams/<int:id>', mock_draft_views.DraftedTeamView.as_view()),
 
     # News
     path('news/', news_views.NewsArticleListView.as_view()),
@@ -43,6 +43,9 @@ urlpatterns = [
     path('game-logs/<int:player_id>/recent/', stats_views.GetPlayerRecentGameLogsView.as_view()),
 
     # Mock drafts
+    path('mock-draft/', mock_draft_views.FantasyDraftListCreateView.as_view()),
+    path('mock-draft/join', mock_draft_views.FantasyDraftJoinView.as_view())
+    
     # Select player
     # Get results
     # Get mock draft setup
