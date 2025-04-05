@@ -44,7 +44,8 @@ urlpatterns = [
 
     # Mock drafts
     path('mock-draft/', mock_draft_views.FantasyDraftListCreateView.as_view()),
-    path('mock-draft/join', mock_draft_views.FantasyDraftJoinView.as_view())
+    path('mock-draft/join', mock_draft_views.FantasyDraftJoinView.as_view()),
+    path('mock-draft/joined/', mock_draft_views.MyJoinedDraftsView.as_view(), name='my-joined-drafts'),
     
     # Select player
     # Get results

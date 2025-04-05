@@ -34,11 +34,11 @@ class FantasyDraftListCreateView(generics.ListCreateAPIView):
 
     # POST: Create a new FantasyDraft object with default fields.
     def perform_create(self, serializer):
-        print("perform create worked!")
-        # Here we explicitly set defaults.
-        print(serializer)
-
-        serializer.save(teams_joined=0, has_started=False, has_finished=False)
+        # Create and save the draft
+        draft = serializer.save()
+        
+        # Return the draft object which will be serialized and sent as the response
+        return draft
 
     # Enforce authentication for creating a new draft.
     def create(self, request, *args, **kwargs):
@@ -47,14 +47,43 @@ class FantasyDraftListCreateView(generics.ListCreateAPIView):
                 {"detail": "Authentication credentials were not provided."},
                 status=status.HTTP_401_UNAUTHORIZED
             )
+
+        if FantasyDraft.objects.filter(has_started=False).count() > 4:
+            return Response(
+                {"error": "Too many drafts exist"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Extract data from the request
+        data = request.data.get('data')
+
+        draft_data = {
+            'number_teams': data.get('num_teams', 10),
+            'teams_joined': 0,  # We'll update this after creating the team
+            'has_started': False,
+            'has_finished': False
+        }
+
         # Get the serializer instance with the incoming data
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=draft_data)
+
         # Validate the data; if invalid, an error response is returned automatically.
         serializer.is_valid(raise_exception=True)
+        
         # Call perform_create to save the instance with defaults
-        self.perform_create(serializer)
+        draft = self.perform_create(serializer)
+
+        # Create the team associated with this draft and the current user
+        team = FantasyDraftTeam.objects.create(
+            draft=draft,
+            user=self.request.user,
+            team_name=data.get('team_name'),
+            draft_position=data.get('draft_position')
+        )
+
         # Prepare headers and response as usual
         headers = self.get_success_headers(serializer.data)
+
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
@@ -63,16 +92,10 @@ class FantasyDraftJoinView(APIView):
     permission_classes = [IsAuthenticated]  # Only authenticated users can join a draft
 
     def post(self, request, format=None):
-        print("hit view")
         # Extract data from request
         draft_id = request.data.get('draft_id')
         team_name = request.data.get('team_name')
         draft_position = request.data.get('draft_position')
-
-        print(request.data)
-        print(draft_id)
-        print(team_name)
-        print(draft_position)
 
         # Validate that all fields are present
         if not draft_id or not team_name or draft_position is None:
@@ -119,3 +142,18 @@ class FantasyDraftJoinView(APIView):
             return Response(team_serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(team_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MyJoinedDraftsView(generics.ListAPIView):
+    serializer_class = FantasyDraftSerializer
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsAuthenticated]  # Only authenticated users can see their drafts
+
+    def get_queryset(self):
+        # Get all draft IDs where the current user has a team
+        user_draft_ids = FantasyDraftTeam.objects.filter(
+            user=self.request.user
+        ).values_list('draft_id', flat=True)
+        
+        # Return all drafts that match these IDs
+        return FantasyDraft.objects.filter(id__in=user_draft_ids)
