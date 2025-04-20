@@ -61,7 +61,8 @@ class FantasyDraftListCreateView(generics.ListCreateAPIView):
             'number_teams': data.get('num_teams', 10),
             'teams_joined': 0,  # We'll update this after creating the team
             'has_started': False,
-            'has_finished': False
+            'has_finished': False,
+            'current_pick': 0,
         }
 
         # Get the serializer instance with the incoming data

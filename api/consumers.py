@@ -37,6 +37,14 @@ class DraftConsumer(AsyncWebsocketConsumer):
             await self.close()
             return
 
+        # Load the draft object once during connection
+        self.draft_instance = await self.get_draft_instance()
+        
+        # Ensure we have the draft instance
+        if not self.draft_instance:
+            await self.close()
+            return
+
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
@@ -96,10 +104,30 @@ class DraftConsumer(AsyncWebsocketConsumer):
                 await self.send_lobby_state()
             elif message_type == 'draft_pick':
                 await self.make_draft_selection(text_data)
+            elif message_type == 'start_draft':
+                await self.start_draft()
 
     # 
     # Methods
     #
+
+    @database_sync_to_async
+    def get_draft_instance(self):
+        try:
+            return get_object_or_404(FantasyDraft, id=self.room_name)
+        except:
+            return None
+    
+    @database_sync_to_async
+    def save_draft_instance(self):
+        self.draft_instance.save()
+
+    @database_sync_to_async
+    def start_draft(self):
+        self.draft_instance.has_started = True
+        self.draft_instance.current_pick = 1
+        self.save_draft_instance()
+
 
     async def chat_message(self, event):
         await self.send(text_data=json.dumps({
@@ -111,19 +139,18 @@ class DraftConsumer(AsyncWebsocketConsumer):
     
     async def send_lobby_state(self):
         # Send the updated lobby state """
-        lobby_state = await self.get_lobby_state(self.room_name)
+        lobby_state = await self.get_lobby_state()
         await self.send(text_data=json.dumps({
             "type": "draft_state",
             "state": lobby_state
     }))
 
     @database_sync_to_async
-    def get_lobby_state(self, draft_id):
-        # Fetch lobby state (mocked for now, ideally from DB/cache) """
-        draft_instance = get_object_or_404(FantasyDraft, id=draft_id)
+    def get_lobby_state(self):
+        draft_instance = self.get_draft_instance()
         serializer = FantasyDraftSerializer(draft_instance)
         return serializer.data
-    
+        
     async def make_draft_selection(self, text_data):
         # check it's the user's turn
 
@@ -135,14 +162,31 @@ class DraftConsumer(AsyncWebsocketConsumer):
         username = data['username']
         player_name = data['player']['player']
         pick = data['pick']
+
+        await self.increment_draft_pick()
+
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 "type": "chat_message",
                 "username": username,
-                "message": 'Drafted:' + player_name + ' at pick ' + str(pick),
+                "message": 'Drafted: ' + player_name + ' at pick ' + str(pick),
             }
         )
+
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                "type": "refresh_draft_state",
+                "message": "Draft updated"
+            }
+        )
+    
+
+    @database_sync_to_async
+    def increment_draft_pick(self):
+        self.draft_instance.current_pick += 1
+        self.save_draft_instance()
 
     # 
     # Auth helpers

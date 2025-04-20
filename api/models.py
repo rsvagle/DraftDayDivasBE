@@ -237,6 +237,7 @@ class FantasyDraft(models.Model):
     id = models.AutoField(primary_key=True)
     number_teams = models.IntegerField()
     teams_joined = models.IntegerField()
+    current_pick = models.IntegerField()
     has_started = models.BooleanField()
     has_finished = models.BooleanField()
 
